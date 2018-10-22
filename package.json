@@ -1,0 +1,17 @@
+{
+  "name": "Monitor",
+  "version": "1.0.0",
+  "description": "Proyecto sistemas multiagentes",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Oscar Rodriguez Villalobos, Guillermo Fernandez Martin, Luis Gonzalez Naharro",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser-xml": "^1.1.0",
+    "express": "^4.16.4",
+    "mustache": "^3.0.0",
+    "xml2js": "^0.4.19"
+  }
+}
