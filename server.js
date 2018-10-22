@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const parseXML = require('xml2js').parseString;
 
+const {prepareSimulation, launchSimulation, stopSimulation} = require('./logic.js')
+
 const bodyParser = require('body-parser');
 require('body-parser-xml')(bodyParser);
 
@@ -43,15 +45,3 @@ app.get('/stop', (req, res) => {
 
 app.listen(3000, ()=> console.log('Server listening in port 3000'));
 
-
-function prepareSimulation() {
-  console.log('Simulacion preparada');
-}
-
-function launchSimulation() {
-  console.log('Simulacion lanzada');
-}
-
-function stopSimulation() {
-  console.log('Simulacion parada')
-}
