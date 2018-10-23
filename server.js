@@ -23,6 +23,7 @@ app.post('/init', (req, res) => {
   } else if(rol === 'tienda'){
     añadirTienda({ip, puerto})
   }
+  // Mandar xml para que la tienda/cliente sepa que la peticion se ha completado adecuadamente
   res.json('El monitor sabe que te has inicializado');
 })
 
