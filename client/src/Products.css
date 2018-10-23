@@ -1,0 +1,9 @@
+.button {
+  position: absolute;
+  bottom: 5%;
+  right: 0;
+}
+.button button {
+  padding: 10px 30px;
+  font-size: 14px;
+}

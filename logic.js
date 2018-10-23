@@ -1,11 +1,11 @@
-const {clientes, tiendas} = require('/store.js');
+const {clientes, tiendas} = require('./store.js');
 
 function prepareSimulation() {
   console.log('Simulacion preparada');
 }
 
 function launchSimulation() {
-  
+
   setTimeout(checkEveryoneIsOn, 10000);
   console.log('Simulacion lanzada');
 }

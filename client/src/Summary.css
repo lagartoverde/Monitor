@@ -1,0 +1,44 @@
+
+.container {
+  width: 60%;
+  height: 100%;
+  margin: auto;
+  position: relative;
+}
+h1 {
+  margin-bottom: 50px;
+  margin-top: 50px;
+  text-decoration: underline;
+}
+table {
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  background-color: #FFF;
+}
+th{
+  color: #777;
+}
+td, th {
+  text-align: center;
+  padding: 20px;
+  border-bottom: 1px solid #CCC;
+}
+
+tr:last-child td {
+  border-bottom:0;
+}
+
+.buttons {
+  position: absolute;
+  bottom: 5%;
+  right: 0;
+  width: 30%;
+  display: flex;
+  justify-content: space-between;
+}
+.buttons button {
+  padding: 10px 30px;
+  font-size: 14px;
+
+}
