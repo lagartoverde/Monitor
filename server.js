@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const parseXML = require('xml2js').parseString;
 
-const {prepareSimulation, launchSimulation, stopSimulation} = require('./logic.js')
+const {prepareSimulation, launchSimulation, stopSimulation, construirCabecera} = require('./logic.js')
 const { clientes, tiendas } = require('./store.js');
 
 const bodyParser = require('body-parser');
@@ -58,5 +58,13 @@ app.get('/stop', (req, res) => {
   res.send('El monitor para la simulacion');
 })
 
-app.listen(3000, ()=> console.log('Server listening in port 3000'));
+app.get('/patata', (req, res) => {
+  var emi = {ip: '192.168.1.1', puerto: '80', rol: 'Comprador'} 
+  var rec = {ip: '192.168.1.2', puerto: '80', rol: 'Monitor'}
+  construirCabecera(emi, rec, 'patata', '00:00', 'plantillaCabecera', {emisor: emi, receptor: rec, tipo: 'patata', hora: '1234', cuerpo: 'patataaaa'}).then((result) => {
+    res.send(result)
+  })
+  
+})
 
+app.listen(3000, ()=> console.log('Server listening in port 3000'));
