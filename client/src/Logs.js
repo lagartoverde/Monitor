@@ -9,42 +9,22 @@ export default class Logs extends React.Component {
     this.state = {
       logs: []
     }
+    this.getLogs = this.getLogs.bind(this);
   }
   componentDidMount() {
-    this.setState((prevState) => ({
-      logs: [
-        {
-          emisor: '192.168.1.1:80',
-          receptor: '192.168.1.2:80',
-          hora: '18:34:00',
-          tipo: 'compra'
-        },
-        {
-          emisor: '192.168.1.3:80',
-          receptor: '192.168.1.4:80',
-          hora: '18:34:10',
-          tipo: 'pregunta'
-        },
-        {
-          emisor: '192.168.1.7:80',
-          receptor: '192.168.2.2:80',
-          hora: '18:34:20',
-          tipo: 'compra'
-        },
-        {
-          emisor: '192.168.1.1:80',
-          receptor: '192.168.1.2:80',
-          hora: '18:34:34',
-          tipo: 'salir'
-        },
-        {
-          emisor: '192.168.1.15:80',
-          receptor: '192.168.1.6:80',
-          hora: '18:34:10',
-          tipo: 'venta'
-        },
-      ]
-    }))
+    setInterval(this.getLogs, 100);
+  }
+  getLogs() {
+    fetch('http://localhost:3000/api/logs', {
+      method: 'GET',
+      mode: 'cors'
+    })
+    .then((response) => response.json())
+    .then((json)=> {
+      this.setState((prevState) => ({
+        logs: json
+      }))
+    })
   }
   render() {
     return (
@@ -65,7 +45,7 @@ export default class Logs extends React.Component {
               <td>{log.hora}</td>
               <td>{log.tipo}</td>
               <td>
-                <Link to='/logs/1'>
+                <Link to={`/logs/${log.id}`}>
                   <FontAwesomeIcon icon="ellipsis-h" />
                 </Link>
               </td>

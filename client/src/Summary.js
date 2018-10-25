@@ -11,42 +11,22 @@ export default class Summary extends React.Component {
     this.state = {
       agents: []
     }
+    this.getAgents = this.getAgents.bind(this);
   }
   componentDidMount() {
-    this.setState((prevState) => ({
-      agents: [
-        {
-          ip: '192.168.1.1',
-          puerto: '80',
-          rol: 'cliente',
-          ready: true
-        },
-        {
-          ip: '192.168.1.2',
-          puerto: '80',
-          rol: 'cliente',
-          ready: true
-        },
-        {
-          ip: '192.168.1.3',
-          puerto: '80',
-          rol: 'tienda',
-          ready: false
-        },
-        {
-          ip: '192.168.1.4',
-          puerto: '80',
-          rol: 'tienda',
-          ready: true
-        },
-        {
-          ip: '192.168.1.5',
-          puerto: '80',
-          rol: 'tienda',
-          ready: false
-        },
-      ]
-    }))
+    setInterval(this.getAgents, 100);
+  }
+  getAgents() {
+    fetch('http://localhost:3000/api/agentes', {
+      method: 'GET',
+      mode: 'cors'
+    })
+    .then((response) => response.json())
+    .then((json)=> {
+      this.setState((prevState) => ({
+        agents: json
+      }))
+    })
   }
   render() {
     return (
