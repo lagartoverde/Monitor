@@ -2,13 +2,10 @@ const express = require('express');
 const app = express();
 const parseXML = require('xml2js').parseString;
 
-<<<<<<< HEAD
+
 const {prepareSimulation, launchSimulation, stopSimulation, construirCabecera} = require('./logic.js')
-const { clientes, tiendas } = require('./store.js');
-=======
-const {prepareSimulation, launchSimulation, stopSimulation} = require('./logic.js')
 const { clientes, tiendas, addLog } = require('./store.js');
->>>>>>> fb18e411557016684d9a21918846a61ff55f2ec0
+
 
 const bodyParser = require('body-parser');
 require('body-parser-xml')(bodyParser);
