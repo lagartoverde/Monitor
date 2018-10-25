@@ -29,11 +29,12 @@ async function construirXML(plantilla, datos){
 
 //Llamar a esta funcion para construir las plantillas
 //plantilla es un string con el nombre de la plantilla y datos un diccionario del tipo {param1: dato1...}
-async function construirCabecera(emisor, receptor, tipo, hora, plantilla, datos){
+async function construirCabecera(emisor, receptor, tipo, plantilla, datos){
+  const date = new Date()
   const data = await readFile('xml/plantillaCabecera.hbs','utf8')
   var template = handlebars.compile(data)
   var cuerpo = await construirXML(plantilla, datos)
-  var context = {emisor: emisor, receptor: receptor, tipo: tipo, hora: hora, cuerpo: cuerpo}
+  var context = {emisor: emisor, receptor: receptor, tipo: tipo, hora: date, cuerpo: cuerpo}
   var html = template(context);
   return html
 }

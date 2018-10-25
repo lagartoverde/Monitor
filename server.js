@@ -82,7 +82,7 @@ app.get('/stop', (req, res) => {
 app.get('/patata', (req, res) => {
   var emi = {ip: '192.168.1.1', puerto: '80', rol: 'Comprador'} 
   var rec = {ip: '192.168.1.2', puerto: '80', rol: 'Monitor'}
-  construirCabecera(emi, rec, 'patata', '00:00', 'plantillaCabecera', {emisor: emi, receptor: rec, tipo: 'patata', hora: '1234', cuerpo: 'patataaaa'}).then((result) => {
+  construirCabecera(emi, rec, 'patata', 'plantillaCabecera', {emisor: emi, receptor: rec, tipo: 'patata', hora: '1234', cuerpo: 'patataaaa'}).then((result) => {
     res.send(result)
   })
   
