@@ -9,12 +9,15 @@
     "@fortawesome/react-fontawesome": "^0.1.3",
     "@material-ui/core": "^3.3.0",
     "i": "^0.3.6",
+    "markdown": "^0.5.0",
     "npm": "^6.4.1",
     "react": "^16.5.2",
     "react-bootstrap": "^0.32.4",
     "react-dom": "^16.5.2",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "2.0.5"
+    "react-scripts": "2.0.5",
+    "xml-beautifier": "^0.4.0",
+    "xml-formatter": "^1.0.1"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -51,14 +51,14 @@ export default class Summary extends React.Component {
   render() {
     return (
       <div className='container'>
-        <h1>Summary</h1>
+        <h1>Vista General</h1>
         <table>
           <tr>
             <th>IP</th>
             <th>Puerto</th>
             <th>Rol</th>
-            <th>Ready</th>
-            <th>Products</th>
+            <th>Preparado</th>
+            <th>Productos</th>
           </tr>
           {this.state.agents.map((agent)=> (
             <tr>
@@ -75,8 +75,8 @@ export default class Summary extends React.Component {
           ))}
         </table>
         <div className='buttons'>
-          <Button variant="contained" color="primary"> Prepare </Button>
-          <Button variant="contained" color="secondary"> Launch </Button>
+          <Button variant="contained" color="primary"> Preparar </Button>
+          <Button variant="contained" color="secondary"> Lanzar </Button>
         </div>
       </div>
     )
