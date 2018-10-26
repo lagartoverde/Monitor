@@ -5,7 +5,20 @@ const fs = require('fs');
 const util = require('util');
 const readFile = util.promisify(fs.readFile);
 
-
+// Inicialización de las tiendas y los clientes. A cada tienda se le da una cantidad aleatoria de productos, de forma que
+// todas tengan la misma cantidad total (si es posible). Luego, a cada cliente se le da una cantidad aleatoria de productos,
+// sin importar por ahora que las cantidades totales sean iguales. Por último, para aleatorizar más, se ceden objetos de unas
+// tiendas a otras (dentro de un rango especificado).
+// Parámetros:
+//	- numClientes: el número de clientes a los que repartir productos
+//	- numTiendas: el número de tiendas a las que repartir productos
+//	- numProductos: la cantidad total de productos a repartir al azar
+//	- listaProductos: lista de posibles productos a repartir
+//	- rango: cantidad máxima de productos que una tienda puede ceder a otra
+//
+// Retorno:
+//	- Un array con dos arrays: uno para tiendas y otro para clientes, Cada uno de ellos contiene un array por
+//	  tienda o por cliente, los cuales contienen la lista de productos de dicha tienda o cliente.
 function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos, rango) {
 
   const factorDesviacion = 10;
