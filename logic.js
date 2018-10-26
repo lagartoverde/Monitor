@@ -1,12 +1,66 @@
 const {clientes, tiendas} = require('./store.js');
+const {getCliente, getTienda} = require('./store.js');
 const handlebars = require('handlebars');
 const fs = require('fs');
 const util = require('util');
 const readFile = util.promisify(fs.readFile);
 
 
-function prepareSimulation() {
+function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos, rango) {
+
+  const factorDesviacion = 10;
+  var productosClientes = [];
+  var productosTiendas = [];
+
+  // Inicializar los arrays de tiendas y clientes
+  var i;
+  for (i = 0; i < numTiendas; i++) {
+    productosTiendas.push([]);
+  }
+
+  for (i = 0; i < numClientes; i++) {
+    productosClientes.push([]);
+  }
+
+  // Repartir la misma cantidad de productos a cada tienda y a cada cliente
+  var indexTienda = 0;
+  for (i = 0; i < numProductos; i++) {
+    var prod = listaProductos[Math.floor(Math.random() * listaProductos.length)];
+    var clienteRand = Math.floor(Math.random() * numClientes);
+
+    addProducto(indexTienda, prod, productosTiendas);
+    addProducto(clienteRand, prod, productosClientes);
+
+    indexTienda = (indexTienda + 1) % numTiendas;
+  }
+
   console.log('Simulacion preparada');
+
+  return [productosTiendas, productosClientes];
+}
+
+function prodIndex(prod, list) {
+    var x;
+    var i = 0;
+    for (x in list) {
+        if (list[x].producto === prod) {
+            return true;
+        }
+        i += 1;
+    }
+
+    return -1;
+}
+
+function addProducto(id, prod, lista) {
+
+    var ind = prodIndex(prod, lista[id]);
+
+    if (ind == -1) {
+      lista[id].push({producto: prod, cantidad: 0});
+    } else {
+      lista[id][ind].cantidad += 1;
+    }
 }
 
 function launchSimulation() {
