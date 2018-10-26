@@ -28,10 +28,31 @@ function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos
     var prod = listaProductos[Math.floor(Math.random() * listaProductos.length)];
     var clienteRand = Math.floor(Math.random() * numClientes);
 
-    addProducto(indexTienda, prod, productosTiendas);
-    addProducto(clienteRand, prod, productosClientes);
+    addProducto(productosTiendas[indexTienda], prod);
+    addProducto(productosClientes[clienteRand], prod);
 
     indexTienda = (indexTienda + 1) % numTiendas;
+  }
+
+  // Entre pares aleatorios de tiendas, dar productos de una a otra hasta el rango como máximo
+  // Hacer "factorDesviación" veces. Se puede cambiar el valor para controlar el nivel de aleatoriedad
+
+  var idsTiendas = [];
+  for (i = 0; i < numTiendas; i++) {
+    idsTiendas.push(i);
+  }
+
+  i = 0;
+  while (idsTiendas.length > 1 || i <= factorDesviacion) {
+    var rndPos1 = Math.floor(Math.random() * idsTiendas.length);
+    var id1 = idsTiendas[rndPos1];
+    idsTiendas.splice(rndPos1, 1);
+
+    var rndPos2 = Math.floor(Math.random() * idsTiendas.length);
+    var id2 = idsTiendas[rndPos2];
+    idsTiendas.splice(rndPos2, 1);
+
+    cederProds (productosTiendas[rndPos1], productosTiendas[rndPos2], rango);
   }
 
   console.log('Simulacion preparada');
@@ -39,6 +60,26 @@ function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos
   return [productosTiendas, productosClientes];
 }
 
+
+// Acepta dos tiendas y una cantidad máxima de productos a ceder de una tienda a otra.
+// Transfiere productos al azar de una tienda a otra.
+function cederProds(tienda1, tienda2, rango) {
+
+    const numCeder = Math.floor(Math.random() * rango);
+    var i;
+
+    for (i = 0; i < rango; i++) {
+        var indiceProdRnd = Math.floor(Math.random() * tienda1.length);
+	var prodRnd = tienda1[indiceProdRnd].producto;
+ 	deleteProducto(tienda1, prodRnd);
+	addProducto(tienda2, prodRnd);
+    }
+ 
+    return;
+}
+
+// Devuelve la posición de un producto en un array de productos (como en el de una tienda o cliente).
+// Si no existe, devuelve -1.
 function prodIndex(prod, list) {
     var x;
     var i = 0;
@@ -52,15 +93,35 @@ function prodIndex(prod, list) {
     return -1;
 }
 
-function addProducto(id, prod, lista) {
+// Acepta una tienda/cliente y un producto
+// Añade a dicha tienda/cliente el producto si no existe con cantidad 1. Si existe, aumenta la cantidad en 1.
+function addProducto(lista, prod) {
 
-    var ind = prodIndex(prod, lista[id]);
+    var ind = prodIndex(prod, lista);
 
     if (ind == -1) {
-      lista[id].push({producto: prod, cantidad: 0});
+      lista.push({producto: prod, cantidad: 1});
     } else {
-      lista[id][ind].cantidad += 1;
+      lista[ind].cantidad += 1;
     }
+}
+
+// Acepta una tienda y el nombre de un producto. Borra una unidad de dicho producto de la tienda.
+// Si ya no quedan unidades, borra el producto de la tienda.
+function deleteProducto(tienda, producto) {
+    
+    var ind = prodIndex(producto, tienda);
+
+    if (ind == -1) {
+      return;
+    } else {
+      if (tienda[ind].cantidad == 1) {
+	tienda.splice(ind, 1);
+      } else {
+	tienda[ind].cantidad -= 1;
+      }
+    }
+    return;
 }
 
 function launchSimulation() {
