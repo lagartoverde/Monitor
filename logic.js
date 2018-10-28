@@ -17,13 +17,15 @@ const readFile = util.promisify(fs.readFile);
 //	- rango: cantidad máxima de productos que una tienda puede ceder a otra
 //
 // Retorno:
-//	- Un array con dos arrays: uno para tiendas y otro para clientes, Cada uno de ellos contiene un array por
-//	  tienda o por cliente, los cuales contienen la lista de productos de dicha tienda o cliente.
+//	- Un array con tres arrays: los dos primeros son para tiendas para clientes. Cada uno de ellos contiene un array por
+//	  tienda o por cliente, los cuales contienen la lista de productos de dicha tienda o cliente. El último array indica
+//    qué tiendas conoce cada cliente de antemano.
 function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos, rango) {
 
   const factorDesviacion = 10;
   var productosClientes = [];
   var productosTiendas = [];
+  var tiendasConocidas = [];
 
   // Inicializar los arrays de tiendas y clientes
   var i;
@@ -33,6 +35,7 @@ function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos
 
   for (i = 0; i < numClientes; i++) {
     productosClientes.push([]);
+	tiendasConocidas.push([]);
   }
 
   // Repartir la misma cantidad de productos a cada tienda y a cada cliente
@@ -67,10 +70,20 @@ function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos
 
     cederProds (productosTiendas[rndPos1], productosTiendas[rndPos2], rango);
   }
+  
+  // Por último, dar a cada cliente dos tiendas al azar que conoce
+  // TODO: cambiar en el futuro para evitar deadlocks
+  for (i = 0; i < numClientes; i++) {
+	  var t1 = Math.floor(Math.random() * numTiendas);
+	  var t2 = Math.floor(Math.random() * numTiendas);
+	  
+	  tiendasConocidas[i].push(t1);
+	  tiendasConocidas[i].push(t2);
+  }
 
   console.log('Simulacion preparada');
 
-  return [productosTiendas, productosClientes];
+  return [productosTiendas, productosClientes, tiendasConocidas];
 }
 
 
