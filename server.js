@@ -37,7 +37,7 @@ app.post('/init', (req, res) => {
     puerto,
     ready: false
   }
-  if(rol === 'cliente') {
+  if(rol === 'comprador') {
     addCliente(agente)
   } else if(rol === 'tienda'){
     addTienda(agente)

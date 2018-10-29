@@ -35,7 +35,7 @@ function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos
 
   for (i = 0; i < numClientes; i++) {
     productosClientes.push([]);
-	tiendasConocidas.push([]);
+	  tiendasConocidas.push([]);
   }
 
   // Repartir la misma cantidad de productos a cada tienda y a cada cliente
@@ -95,10 +95,10 @@ function cederProds(tienda1, tienda2, rango) {
     var i;
 
     for (i = 0; i < rango; i++) {
-        var indiceProdRnd = Math.floor(Math.random() * tienda1.length);
-	var prodRnd = tienda1[indiceProdRnd].producto;
- 	deleteProducto(tienda1, prodRnd);
-	addProducto(tienda2, prodRnd);
+      var indiceProdRnd = Math.floor(Math.random() * tienda1.length);
+      var prodRnd = tienda1[indiceProdRnd].producto;
+      deleteProducto(tienda1, prodRnd);
+      addProducto(tienda2, prodRnd);
     }
  
     return;
@@ -142,9 +142,9 @@ function deleteProducto(tienda, producto) {
       return;
     } else {
       if (tienda[ind].cantidad == 1) {
-	tienda.splice(ind, 1);
+	      tienda.splice(ind, 1);
       } else {
-	tienda[ind].cantidad -= 1;
+	      tienda[ind].cantidad -= 1;
       }
     }
     return;
