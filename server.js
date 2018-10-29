@@ -31,7 +31,7 @@ app.post('/init', (req, res) => {
   console.log('Emisor IP');
   const ip = req.body.mensaje.emisor[0].direccion[0].ip[0];
   const puerto = req.body.mensaje.emisor[0].direccion[0].puerto[0];
-  const rol = req.body.mensaje.emisor[0].rol[0];
+  const rol = req.body.mensaje.emisor[0].rol[0].toLowerCase()
   const agente = {
     ip,
     puerto,
