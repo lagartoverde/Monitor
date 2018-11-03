@@ -1,9 +1,12 @@
 const express = require('express');
 const app = express();
+const ip = require('ip');
 const parseXML = require('xml2js').parseString;
 
-const {prepareSimulation, launchSimulation, stopSimulation} = require('./logic.js')
-const { addLog, addCliente, addTienda } = require('./store.js');
+const {prepareSimulation, launchSimulation, stopSimulation, construirCabecera} = require('./logic.js')
+const { addLog, addCliente, addTienda, clientes, tiendas } = require('./store.js');
+var emi = {ip: ip.address(), puerto: '3000', rol: 'Monitor'}
+
 
 const bodyParser = require('body-parser');
 require('body-parser-xml')(bodyParser);
@@ -31,25 +34,47 @@ app.post('/init', (req, res) => {
   console.log('Emisor IP');
   const ip = req.body.mensaje.emisor[0].direccion[0].ip[0];
   const puerto = req.body.mensaje.emisor[0].direccion[0].puerto[0];
-  const rol = req.body.mensaje.emisor[0].rol[0];
+  const rol = req.body.mensaje.emisor[0].rol[0].toLowerCase()
   const agente = {
     ip,
     puerto,
-    ready: false
+    ready: false,
+    rol
   }
-  if(rol === 'cliente') {
+  if(rol === 'comprador') {
     addCliente(agente)
   } else if(rol === 'tienda'){
     addTienda(agente)
   }
-  // Mandar xml para que la tienda/cliente sepa que la peticion se ha completado adecuadamente
-  res.json('El monitor sabe que te has inicializado');
+  var rec = {ip: agente.ip, puerto: agente.puerto, rol: agente.rol} 
+
+  construirCabecera(emi, rec, 'evento', 'plantillaACKInicio', {}).then((result) => {
+    res.send(result)
+  })
+
 })
 
 app.get('/prepare', (req, res) => {
   // El monitor tiene que preparar la simulacion
-  prepareSimulation();
-  res.send('El monitor prepara la simulacion');
+  /******
+   * 
+   * for(let cliente of clientes) {
+   * var rec = {ip : cliente.ip, puerto: cliente.puerto, rol: 'Comprador'}
+        var XML = await construirCabecera(emi, rec, 'evento', 'plantillaInicializacionCliente', {producto: {nombre: 'nombre1', cantidad: 2}, tienda: {ip: '123.123.123.123', puerto: '1234'}})
+        Aqui enviar XML. Consultar con tiendas y clientes en clase
+     } 
+
+     for(let tienda of tiendas) {
+   * var rec = {ip : tienda.ip, puerto: tienda.puerto, rol: 'Tienda'}
+        var XML = await construirCabecera(emi, rec, 'evento', 'plantillaInicializacionTienda', {producto: {nombre: 'nombre1', cantidad: 2}})
+        Aqui enviar XML. Consultar con tiendas y clientes en clase
+     }
+   * 
+   * 
+   * 
+   * 
+   */
+  res.send('El monitor prepara la simulacion')
 })
 
 app.get('/go', (req, res) => {
@@ -58,10 +83,6 @@ app.get('/go', (req, res) => {
   res.send('El monitor lanza la simulacion');
 })
 
-app.post('/goReceived', (req, res) => {
-  // El monitor registra que esa tienda/cliente ha empezado
-  res.send('El monitor sabe que has empezado la simulacion');
-})
 
 app.get('/stop', (req, res) => {
   // El monitor para la simulacion
