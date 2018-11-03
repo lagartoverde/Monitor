@@ -20,6 +20,9 @@ const readFile = util.promisify(fs.readFile);
 //	- Un array con tres arrays: los dos primeros son para tiendas para clientes. Cada uno de ellos contiene un array por
 //	  tienda o por cliente, los cuales contienen la lista de productos de dicha tienda o cliente. El último array indica
 //    qué tiendas conoce cada cliente de antemano.
+//
+// Ejemplo de uso:
+// - var result = prepareSimulation(10, 20, 200, ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p0"], 5);
 function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos, rango) {
 
   const factorDesviacion = 10;
