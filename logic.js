@@ -15,15 +15,18 @@ const readFile = util.promisify(fs.readFile);
 //	- numProductos: la cantidad total de productos a repartir al azar
 //	- listaProductos: lista de posibles productos a repartir
 //	- rango: cantidad máxima de productos que una tienda puede ceder a otra
+//  - ipEmi: ip del monitor
+//  - puertoEmi: puerto del monitor
 //
 // Retorno:
 //	- Un array con tres arrays: los dos primeros son para tiendas para clientes. Cada uno de ellos contiene un array por
 //	  tienda o por cliente, los cuales contienen la lista de productos de dicha tienda o cliente. El último array indica
-//    qué tiendas conoce cada cliente de antemano.
+//    qué tiendas conoce cada cliente de antemano. Además de todo esto, crea los XML de inicializacion para cada tienda 
+//    y para cada cliente
 //
 // Ejemplo de uso:
-// - var result = prepareSimulation(10, 20, 200, ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p0"], 5);
-function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos, rango) {
+// - var result = prepareSimulation(10, 20, 200, ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p0"], 5, "192.168.1.1", "80");
+function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos, rango,ipEmi,puertoEmi) {
 
   const factorDesviacion = 10;
   var productosClientes = [];
@@ -131,8 +134,8 @@ function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos
 	  <mensaje>
 		<emisor>
 			<direccion>
-				<ip>192.168.1.1</ip>
-				<puerto>80</puerto>
+				<ip>${ipEmi}</ip>
+				<puerto>${puertoEmi}</puerto>
 			</direccion>
 			<rol>Monitor</rol>
 		</emisor>
@@ -191,8 +194,8 @@ function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos
 	  <mensaje>
 		<emisor>
 			<direccion>
-				<ip>192.168.1.1</ip>
-				<puerto>80</puerto>
+				<ip>${ipEmi}</ip>
+				<puerto>${puertoEmi}</puerto>
 			</direccion>
 			<rol>Monitor</rol>
 		</emisor>
