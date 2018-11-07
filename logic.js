@@ -15,12 +15,18 @@ const readFile = util.promisify(fs.readFile);
 //	- numProductos: la cantidad total de productos a repartir al azar
 //	- listaProductos: lista de posibles productos a repartir
 //	- rango: cantidad máxima de productos que una tienda puede ceder a otra
+//  - ipEmi: ip del monitor
+//  - puertoEmi: puerto del monitor
 //
 // Retorno:
 //	- Un array con tres arrays: los dos primeros son para tiendas para clientes. Cada uno de ellos contiene un array por
 //	  tienda o por cliente, los cuales contienen la lista de productos de dicha tienda o cliente. El último array indica
-//    qué tiendas conoce cada cliente de antemano.
-function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos, rango) {
+//    qué tiendas conoce cada cliente de antemano. Además de todo esto, crea los XML de inicializacion para cada tienda 
+//    y para cada cliente
+//
+// Ejemplo de uso:
+// - var result = prepareSimulation(10, 20, 200, ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p0"], 5, "192.168.1.1", "80");
+function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos, rango,ipEmi,puertoEmi) {
 
   const factorDesviacion = 10;
   var productosClientes = [];
@@ -79,6 +85,141 @@ function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos
 	  
 	  tiendasConocidas[i].push(t1);
 	  tiendasConocidas[i].push(t2);
+  }
+  
+  // Con todas las estructuras de datos creadas, ya es posible empezar a crear los archivos XML de inicialización.
+  // Aquí es donde se lleva a cabo dicha magia.
+  
+  // Preparar primero los ficheros de inicialización de clientes
+  for (i = 0; i < numClientes; i++) {
+	  var archSalida = "iniciarCliente_" + i + ".txt";
+	  fs.open(archSalida, 'w', function (err, file) {
+		  if (err) throw err;
+		  console.log("Creado archivo de inicialización del cliente " + i);
+	  });
+	  
+	  var cliente = getCliente(i);
+	  var ip = cliente.ip;
+	  var puerto = cliente.puerto;
+	  
+	  var listaCompra = "";
+	  
+	  // Rellenar la lista de la compra para el XML de cada cliente
+	  for (producto in productosClientes[i]) {
+		  listaCompra += "<producto>\n";
+		  listaCompra += "<nombre>" + producto.producto + "</nombre>\n";
+		  listaCompra += "<cantidad>" + producto.cantidad + "</cantidad>\n";
+		  listaCompra += "</producto>";
+	  }
+	  
+	  var listaTiendas = "";
+	  
+	  // Rellenar la lista de tiendas conocidas para el XML de cada cliente
+	  for (tienda in tiendasConocidas[i]) {
+		  listaTiendas += "<tienda>\n";
+		  listaTiendas += "<direccion>\n";
+		  
+		  var dirTienda = getTienda(tienda);
+		  var ipTienda = dirTienda.direccion;
+		  var puertoTienda = dirTienda.puerto;
+		  listaTiendas += "<ip>" + ipTienda + "</ip>\n";
+		  listaTiendas += "<puerto>" + puertoTienda + "</puerto>\n";
+		  listaTiendas += "</direccion>\n</tienda>\n";
+	  }
+	  
+	  // Rellenar todo el XML de cada cliente
+	  var xmlCliente = `
+	  <?xml version="1.0"?>
+		
+	  <mensaje>
+		<emisor>
+			<direccion>
+				<ip>${ipEmi}</ip>
+				<puerto>${puertoEmi}</puerto>
+			</direccion>
+			<rol>Monitor</rol>
+		</emisor>
+		<receptor>
+			<direccion>
+				<ip>${ip}</ip>
+				<puerto>${puerto}</puerto>
+			</direccion>
+			<rol>Comprador</rol>
+		</receptor>
+		<tipo>inicializacion</tipo>
+		<cuerpo>
+			<listaCompra>
+				${listaCompra}
+			</listaCompra>
+			<listaTiendas>
+				${listaTiendas}
+			</listaTiendas>
+		</cuerpo>
+	  </mensaje>
+	  `;
+	  
+	  // Guardar el XML de cada cliente
+	  fs.appendFile(archSalida, xmlCliente, function (err) {
+		if (err) throw err;
+		console.log('Rellenado fichero XML para el cliente ' + i);
+	  });
+  }
+  
+  // Y ya por último, preparar el XML para cada tienda
+  for (i = 0; i < numTiendas; i++) {
+	  var archSalida = "iniciarTienda_" + i + ".txt";
+	  fs.open(archSalida, 'w', function (err, file) {
+		  if (err) throw err;
+		  console.log("Creado archivo de inicialización de la tienda " + i);
+	  });
+	  
+	  var tienda = getTienda(i);
+	  var ip = tienda.ip;
+	  var puerto = tienda.puerto;
+	  
+	  var listaVenta = "";
+	  
+	  // Rellenar la lista de la venta para el XML de cada tienda
+	  for (producto in productosTiendas[i]) {
+		  listaVenta += "<producto>\n";
+		  listaVenta += "<nombre>" + producto.producto + "</nombre>\n";
+		  listaVenta += "<cantidad>" + producto.cantidad + "</cantidad>\n";
+		  listaVenta += "</producto>";
+	  }
+	  
+	  // Rellenar todo el XML de cada tienda
+	  var xmlTienda = `
+	  <?xml version="1.0"?>
+		
+	  <mensaje>
+		<emisor>
+			<direccion>
+				<ip>${ipEmi}</ip>
+				<puerto>${puertoEmi}</puerto>
+			</direccion>
+			<rol>Monitor</rol>
+		</emisor>
+		<receptor>
+			<direccion>
+				<ip>${ip}</ip>
+				<puerto>${puerto}</puerto>
+			</direccion>
+			<rol>Tienda</rol>
+		</receptor>
+		<tipo>inicializacion</tipo>
+		<cuerpo>
+			<listaProductos>
+				${listaVenta}
+			</listaCompra>
+		</cuerpo>
+	  </mensaje>
+	  `;
+	  
+	  // Guardar el XML de cada tienda
+	  fs.appendFile(archSalida, xmlTienda, function (err) {
+		if (err) throw err;
+		console.log('Rellenado fichero XML para la tienda ' + i);
+	  });
   }
 
   console.log('Simulacion preparada');
