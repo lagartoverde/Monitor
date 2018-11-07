@@ -3,10 +3,9 @@ const app = express();
 const ip = require('ip');
 const parseXML = require('xml2js').parseString;
 
-const {prepareSimulation, launchSimulation, stopSimulation, construirCabecera} = require('./logic.js')
+const {prepareSimulation, launchSimulation, stopSimulation, construirCabecera, mockPrepareTienda, mockPrepareCliente} = require('./logic.js')
 const { addLog, addCliente, addTienda, clientes, tiendas } = require('./store.js');
 var emi = {ip: ip.address(), puerto: '3000', rol: 'Monitor'}
-
 
 const bodyParser = require('body-parser');
 require('body-parser-xml')(bodyParser);
@@ -32,6 +31,7 @@ app.use('/api', apiController);
 app.post('/init', (req, res) => {
   // Una tienda/cliente se ha inicializado
   console.log('Emisor IP');
+  //Se obtienen los parámetros correspondientes para añadirlos del XML
   const ip = req.body.mensaje.emisor[0].direccion[0].ip[0];
   const puerto = req.body.mensaje.emisor[0].direccion[0].puerto[0];
   const rol = req.body.mensaje.emisor[0].rol[0].toLowerCase()
@@ -41,22 +41,40 @@ app.post('/init', (req, res) => {
     ready: false,
     rol
   }
+
+  //Se comprueba el rol para diferenciar a la hora de preparar la simulacion
   if(rol === 'comprador') {
     addCliente(agente)
   } else if(rol === 'tienda'){
     addTienda(agente)
   }
   var rec = {ip: agente.ip, puerto: agente.puerto, rol: agente.rol} 
-
+  //Se construye el XML que será enviado como ACK de la inicializacion donde se entregara el ID
   construirCabecera(emi, rec, 'evento', 'plantillaACKInicio', {id: agente.id}).then((result) => {
     res.send(result)
   })
 
 })
 
+app.get('/prepareStore', (req, res) => {
+  var datos = mockPrepareTienda()
+  var rec = {ip: '192.0.0.0', puerto: '80', rol: 'Tienda'} 
+  construirCabecera(emi, rec, 'evento', 'plantillaInicializacionTienda', datos).then((result) => {
+    res.send(result)
+  })
+})
+
+app.get('/prepareClient', (req, res) => {
+  var datos = mockPrepareCliente()
+  var rec = {ip: '192.0.0.0', puerto: '80', rol: 'Tienda'} 
+  construirCabecera(emi, rec, 'evento', 'plantillaInicializacionCliente', datos).then((result) => {
+    res.send(result)
+  })
+})
+
+
+
 app.get('/prepare', (req, res) => {
-  result = prepareSimulation(10, 20, 200, ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p0"], 5)
-  console.log(result)
   // El monitor tiene que preparar la simulacion
   /******
    * 

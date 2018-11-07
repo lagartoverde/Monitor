@@ -193,4 +193,14 @@ function checkEveryoneIsOn() {
   }
 }
 
-module.exports = { prepareSimulation, launchSimulation, stopSimulation, construirCabecera}
+function mockPrepareTienda(){
+  return {producto: [{nombre: 'p1', cantidad: '1'}, {nombre: 'p2', cantidad: '2'}, {nombre: 'p3', cantidad: '3'}, {nombre: 'p4', cantidad: '4'}]}
+}
+
+function mockPrepareCliente(){
+  var productos = [{nombre: 'p1', cantidad: '1'}, {nombre: 'p2', cantidad: '2'}, {nombre: 'p3', cantidad: '3'}, {nombre: 'p4', cantidad: '4'}]
+  var tiendas = [{ip: '192.168.1.1', puerto: '80', id: '1'}, {ip: '192.168.1.2', puerto: '80', id: '2'}, {ip: '192.168.1.3', puerto: '80', id: '3'}, {ip: '192.168.1.4', puerto: '80', id: '4'}]
+  return {producto: productos, tienda: tiendas}
+}
+
+module.exports = { prepareSimulation, launchSimulation, stopSimulation, construirCabecera, mockPrepareTienda, mockPrepareCliente}
