@@ -5,28 +5,23 @@ const fs = require('fs');
 const util = require('util');
 const readFile = util.promisify(fs.readFile);
 
-// Inicialización de las tiendas y los clientes. A cada tienda se le da una cantidad aleatoria de productos, de forma que
-// todas tengan la misma cantidad total (si es posible). Luego, a cada cliente se le da una cantidad aleatoria de productos,
-// sin importar por ahora que las cantidades totales sean iguales. Por último, para aleatorizar más, se ceden objetos de unas
-// tiendas a otras (dentro de un rango especificado).
-// Parámetros:
-//	- numClientes: el número de clientes a los que repartir productos
-//	- numTiendas: el número de tiendas a las que repartir productos
-//	- numProductos: la cantidad total de productos a repartir al azar
-//	- listaProductos: lista de posibles productos a repartir
-//	- rango: cantidad máxima de productos que una tienda puede ceder a otra
-//  - ipEmi: ip del monitor
-//  - puertoEmi: puerto del monitor
-//
-// Retorno:
-//	- Un array con tres arrays: los dos primeros son para tiendas para clientes. Cada uno de ellos contiene un array por
-//	  tienda o por cliente, los cuales contienen la lista de productos de dicha tienda o cliente. El último array indica
-//    qué tiendas conoce cada cliente de antemano. Además de todo esto, crea los XML de inicializacion para cada tienda 
-//    y para cada cliente
-//
-// Ejemplo de uso:
-// - var result = prepareSimulation(10, 20, 200, ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p0"], 5, "192.168.1.1", "80");
-function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos, rango,ipEmi,puertoEmi) {
+/**
+ * Inicialización de las tiendas y los clientes. A cada tienda se le da una cantidad aleatoria de productos, 
+ * de forma que todas tengan la misma cantidad total (si es posible). Luego, a cada cliente se le da 
+ * una cantidad aleatoria de productos, sin importar por ahora que las cantidades totales sean iguales. 
+ * Por último, para aleatorizar más, se ceden objetos de unas tiendas a otras (dentro de un rango especificado).
+ * 
+ * @param {el número de clientes a los que repartir productos} numClientes 
+ * @param {el número de tiendas a las que repartir productos} numTiendas 
+ * @param {la cantidad total de productos a repartir al azar} numProductos 
+ * @param {lista de posibles productos a repartir} listaProductos 
+ * @param {cantidad máxima de productos que una tienda puede ceder a otra} rango 
+ *  Retorno:
+ *	- Un array con tres arrays: los dos primeros son para tiendas para clientes. Cada uno de ellos contiene un array por
+ *    tienda o por cliente, los cuales contienen la lista de productos de dicha tienda o cliente. El último array indica
+ *    qué tiendas conoce cada cliente de antemano.
+ */
+function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos, rango) {
 
   const factorDesviacion = 10;
   var productosClientes = [];
@@ -86,141 +81,6 @@ function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos
 	  tiendasConocidas[i].push(t1);
 	  tiendasConocidas[i].push(t2);
   }
-  
-  // Con todas las estructuras de datos creadas, ya es posible empezar a crear los archivos XML de inicialización.
-  // Aquí es donde se lleva a cabo dicha magia.
-  
-  // Preparar primero los ficheros de inicialización de clientes
-  for (i = 0; i < numClientes; i++) {
-	  var archSalida = "iniciarCliente_" + i + ".txt";
-	  fs.open(archSalida, 'w', function (err, file) {
-		  if (err) throw err;
-		  console.log("Creado archivo de inicialización del cliente " + i);
-	  });
-	  
-	  var cliente = getCliente(i);
-	  var ip = cliente.ip;
-	  var puerto = cliente.puerto;
-	  
-	  var listaCompra = "";
-	  
-	  // Rellenar la lista de la compra para el XML de cada cliente
-	  for (producto in productosClientes[i]) {
-		  listaCompra += "<producto>\n";
-		  listaCompra += "<nombre>" + producto.producto + "</nombre>\n";
-		  listaCompra += "<cantidad>" + producto.cantidad + "</cantidad>\n";
-		  listaCompra += "</producto>";
-	  }
-	  
-	  var listaTiendas = "";
-	  
-	  // Rellenar la lista de tiendas conocidas para el XML de cada cliente
-	  for (tienda in tiendasConocidas[i]) {
-		  listaTiendas += "<tienda>\n";
-		  listaTiendas += "<direccion>\n";
-		  
-		  var dirTienda = getTienda(tienda);
-		  var ipTienda = dirTienda.direccion;
-		  var puertoTienda = dirTienda.puerto;
-		  listaTiendas += "<ip>" + ipTienda + "</ip>\n";
-		  listaTiendas += "<puerto>" + puertoTienda + "</puerto>\n";
-		  listaTiendas += "</direccion>\n</tienda>\n";
-	  }
-	  
-	  // Rellenar todo el XML de cada cliente
-	  var xmlCliente = `
-	  <?xml version="1.0"?>
-		
-	  <mensaje>
-		<emisor>
-			<direccion>
-				<ip>${ipEmi}</ip>
-				<puerto>${puertoEmi}</puerto>
-			</direccion>
-			<rol>Monitor</rol>
-		</emisor>
-		<receptor>
-			<direccion>
-				<ip>${ip}</ip>
-				<puerto>${puerto}</puerto>
-			</direccion>
-			<rol>Comprador</rol>
-		</receptor>
-		<tipo>inicializacion</tipo>
-		<cuerpo>
-			<listaCompra>
-				${listaCompra}
-			</listaCompra>
-			<listaTiendas>
-				${listaTiendas}
-			</listaTiendas>
-		</cuerpo>
-	  </mensaje>
-	  `;
-	  
-	  // Guardar el XML de cada cliente
-	  fs.appendFile(archSalida, xmlCliente, function (err) {
-		if (err) throw err;
-		console.log('Rellenado fichero XML para el cliente ' + i);
-	  });
-  }
-  
-  // Y ya por último, preparar el XML para cada tienda
-  for (i = 0; i < numTiendas; i++) {
-	  var archSalida = "iniciarTienda_" + i + ".txt";
-	  fs.open(archSalida, 'w', function (err, file) {
-		  if (err) throw err;
-		  console.log("Creado archivo de inicialización de la tienda " + i);
-	  });
-	  
-	  var tienda = getTienda(i);
-	  var ip = tienda.ip;
-	  var puerto = tienda.puerto;
-	  
-	  var listaVenta = "";
-	  
-	  // Rellenar la lista de la venta para el XML de cada tienda
-	  for (producto in productosTiendas[i]) {
-		  listaVenta += "<producto>\n";
-		  listaVenta += "<nombre>" + producto.producto + "</nombre>\n";
-		  listaVenta += "<cantidad>" + producto.cantidad + "</cantidad>\n";
-		  listaVenta += "</producto>";
-	  }
-	  
-	  // Rellenar todo el XML de cada tienda
-	  var xmlTienda = `
-	  <?xml version="1.0"?>
-		
-	  <mensaje>
-		<emisor>
-			<direccion>
-				<ip>${ipEmi}</ip>
-				<puerto>${puertoEmi}</puerto>
-			</direccion>
-			<rol>Monitor</rol>
-		</emisor>
-		<receptor>
-			<direccion>
-				<ip>${ip}</ip>
-				<puerto>${puerto}</puerto>
-			</direccion>
-			<rol>Tienda</rol>
-		</receptor>
-		<tipo>inicializacion</tipo>
-		<cuerpo>
-			<listaProductos>
-				${listaVenta}
-			</listaCompra>
-		</cuerpo>
-	  </mensaje>
-	  `;
-	  
-	  // Guardar el XML de cada tienda
-	  fs.appendFile(archSalida, xmlTienda, function (err) {
-		if (err) throw err;
-		console.log('Rellenado fichero XML para la tienda ' + i);
-	  });
-  }
 
   console.log('Simulacion preparada');
 
@@ -232,7 +92,6 @@ function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos
 // Transfiere productos al azar de una tienda a otra.
 function cederProds(tienda1, tienda2, rango) {
 
-    const numCeder = Math.floor(Math.random() * rango);
     var i;
 
     for (i = 0; i < rango; i++) {
@@ -248,15 +107,12 @@ function cederProds(tienda1, tienda2, rango) {
 // Devuelve la posición de un producto en un array de productos (como en el de una tienda o cliente).
 // Si no existe, devuelve -1.
 function prodIndex(prod, list) {
-    var x;
-    var i = 0;
-    for (x in list) {
-        if (list[x].producto === prod) {
+    var elem;
+    for (elem in list) {
+        if (list[elem].producto === prod) {
             return true;
         }
-        i += 1;
     }
-
     return -1;
 }
 
@@ -291,17 +147,30 @@ function deleteProducto(tienda, producto) {
     return;
 }
 
+/**
+ * Lanza la simulacion, realizando un envio broadcast de los mensajes a los agentes
+ */
 function launchSimulation() {
 
   setTimeout(checkEveryoneIsOn, 10000);
   console.log('Simulacion lanzada');
 }
-
+/**
+ * Detiene la simulacion, realizando un envio broadcast de los mensajes a los agentes
+ */
 function stopSimulation() {
   console.log('Simulacion parada')
 }
 
-async function construirXML(plantilla, datos){
+/**
+ * Dada una plantilla, esta funcion construye el XML necesario.
+ * Para ello, utiliza las plantillas dinamicas Handlebars que rellenan automaticamente
+ * los datos necesarios, que se pasan por parametro.
+ * Esta funcion rellena el cuerpo de un mensaje XML que se enviara a un agente
+ * @param {Nombre de la plantilla Handlebars} plantilla 
+ * @param {Diccionario con los datos que requiere la plantilla} datos 
+ */
+async function construirCuerpo(plantilla, datos){
   file = 'xml/' + plantilla +'.hbs'
   const data = await readFile(file,'utf8')
   var template = handlebars.compile(data)
@@ -311,16 +180,29 @@ async function construirXML(plantilla, datos){
 
 //Llamar a esta funcion para construir las plantillas
 //plantilla es un string con el nombre de la plantilla y datos un diccionario del tipo {param1: dato1...}
-async function construirCabecera(emisor, receptor, tipo, plantilla, datos){
+/**
+ * Esta funcion construye el XML que se enviara a cada agente. Para ello coge los parametros necesarios del
+ * emisor y receptor, y el contenido del cuerpo. 
+ * @param {Diccionario con los datos del emisor, que siempre sera el propio Monitor} emisor 
+ * @param {Diccionario con los datos del receptor: ip, puerto, rol, id} receptor 
+ * @param {Tipo de mensaje a enviar (ACK, evento...)} tipo 
+ * @param {Nombre de la plantilla a rellenar} plantilla 
+ * @param {Datos necesarios para la construccion de la plantilla} datos 
+ */
+async function construirXML(emisor, receptor, tipo, plantilla, datos){
   const date = new Date()
   const data = await readFile('xml/plantillaCabecera.hbs','utf8')
   var template = handlebars.compile(data)
-  var cuerpo = await construirXML(plantilla, datos)
+  var cuerpo = await construirCuerpo(plantilla, datos)
   var context = {emisor: emisor, receptor: receptor, tipo: tipo, hora: date, cuerpo: cuerpo}
-  var html = template(context);
-  return html
+  var xml = template(context);
+  return xml
 }
 
+/**
+ * Comprueba que todos los agentes estan preparados para iniciar la simulacion, si no
+ * la detiene
+ */
 function checkEveryoneIsOn() {
   for(let cliente of clientes) {
     if(!cliente.ready) {
@@ -334,4 +216,22 @@ function checkEveryoneIsOn() {
   }
 }
 
-module.exports = { prepareSimulation, launchSimulation, stopSimulation, construirCabecera}
+/**
+ * Devuelve un array con el formato necesario para crear el XML de inicio de Tienda, para propositos
+ * de comprobacion de conexion
+ */
+function mockPrepareTienda(){
+  return {producto: [{nombre: 'p1', cantidad: '1'}, {nombre: 'p2', cantidad: '2'}, {nombre: 'p3', cantidad: '3'}, {nombre: 'p4', cantidad: '4'}]}
+}
+
+/**
+ * Devuelve un array con el formato necesario para crear el XML de inicio de Cliente, para propositos
+ * de comprobacion de conexion
+ */
+function mockPrepareCliente(){
+  var productos = [{nombre: 'p1', cantidad: '1'}, {nombre: 'p2', cantidad: '2'}, {nombre: 'p3', cantidad: '3'}, {nombre: 'p4', cantidad: '4'}]
+  var tiendas = [{ip: '192.168.1.1', puerto: '80', id: '1'}, {ip: '192.168.1.2', puerto: '80', id: '2'}, {ip: '192.168.1.3', puerto: '80', id: '3'}, {ip: '192.168.1.4', puerto: '80', id: '4'}]
+  return {producto: productos, tienda: tiendas}
+}
+
+module.exports = { prepareSimulation, launchSimulation, stopSimulation, construirXML, mockPrepareTienda, mockPrepareCliente}
