@@ -48,18 +48,21 @@ app.post('/init', (req, res) => {
   }
   var rec = {ip: agente.ip, puerto: agente.puerto, rol: agente.rol} 
 
-  construirCabecera(emi, rec, 'evento', 'plantillaACKInicio', {}).then((result) => {
+  construirCabecera(emi, rec, 'evento', 'plantillaACKInicio', {id: agente.id}).then((result) => {
     res.send(result)
   })
 
 })
 
 app.get('/prepare', (req, res) => {
+  result = prepareSimulation(10, 20, 200, ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p0"], 5)
+  console.log(result)
   // El monitor tiene que preparar la simulacion
   /******
    * 
    * for(let cliente of clientes) {
    * var rec = {ip : cliente.ip, puerto: cliente.puerto, rol: 'Comprador'}
+   * 
         var XML = await construirCabecera(emi, rec, 'evento', 'plantillaInicializacionCliente', {producto: {nombre: 'nombre1', cantidad: 2}, tienda: {ip: '123.123.123.123', puerto: '1234'}})
         Aqui enviar XML. Consultar con tiendas y clientes en clase
      } 
