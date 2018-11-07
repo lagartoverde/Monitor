@@ -1,0 +1,172 @@
+<DOCTYPE! html>
+
+<head>
+
+<title> Test </title>
+
+<script>
+function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos, rango) {
+
+  const factorDesviacion = 10;
+  var productosClientes = [];
+  var productosTiendas = [];
+  var tiendasConocidas = [];
+
+  // Inicializar los arrays de tiendas y clientes
+  var i;
+  for (i = 0; i < numTiendas; i++) {
+    productosTiendas.push([]);
+  }
+
+  for (i = 0; i < numClientes; i++) {
+    productosClientes.push([]);
+	tiendasConocidas.push([]);
+  }
+
+  // Repartir la misma cantidad de productos a cada tienda y a cada cliente
+  var indexTienda = 0;
+  for (i = 0; i < numProductos; i++) {
+    var prod = listaProductos[Math.floor(Math.random() * listaProductos.length)];
+    var clienteRand = Math.floor(Math.random() * numClientes);
+
+    addProducto(productosTiendas[indexTienda], prod);
+    addProducto(productosClientes[clienteRand], prod);
+
+    indexTienda = (indexTienda + 1) % numTiendas;
+  }
+
+  // Entre pares aleatorios de tiendas, dar productos de una a otra hasta el rango como máximo
+  // Hacer "factorDesviación" veces. Se puede cambiar el valor para controlar el nivel de aleatoriedad
+
+  var idsTiendas = [];
+  for (i = 0; i < numTiendas; i++) {
+    idsTiendas.push(i);
+  }
+
+  i = 0;
+  while (idsTiendas.length > 1 || i <= factorDesviacion) {
+    var rndPos1 = Math.floor(Math.random() * idsTiendas.length);
+    var id1 = idsTiendas[rndPos1];
+    idsTiendas.splice(rndPos1, 1);
+
+    var rndPos2 = Math.floor(Math.random() * idsTiendas.length);
+    var id2 = idsTiendas[rndPos2];
+    idsTiendas.splice(rndPos2, 1);
+
+    cederProds (productosTiendas[rndPos1], productosTiendas[rndPos2], rango);
+	console.log("En bucle 2");
+	i++;
+  }
+  
+  // Por último, dar a cada cliente dos tiendas al azar que conoce
+  // TODO: cambiar en el futuro para evitar deadlocks
+  for (i = 0; i < numClientes; i++) {
+	  var t1 = Math.floor(Math.random() * numTiendas);
+	  var t2 = Math.floor(Math.random() * numTiendas);
+	  
+	  tiendasConocidas[i].push(t1);
+	  tiendasConocidas[i].push(t2);
+	  console.log("En bucle 3");
+  }
+
+  console.log('Simulacion preparada');
+
+  return [productosTiendas, productosClientes, tiendasConocidas];
+}
+
+
+// Acepta dos tiendas y una cantidad máxima de productos a ceder de una tienda a otra.
+// Transfiere productos al azar de una tienda a otra.
+function cederProds(tienda1, tienda2, rango) {
+
+    const numCeder = Math.floor(Math.random() * rango);
+    var i;
+
+    for (i = 0; i < rango; i++) {
+        var indiceProdRnd = Math.floor(Math.random() * tienda1.length);
+	var prodRnd = tienda1[indiceProdRnd].producto;
+ 	deleteProducto(tienda1, prodRnd);
+	addProducto(tienda2, prodRnd);
+    }
+ 
+    return;
+}
+
+// Devuelve la posición de un producto en un array de productos (como en el de una tienda o cliente).
+// Si no existe, devuelve -1.
+function prodIndex(prod, list) {
+    var x;
+    var i = 0;
+    for (x in list) {
+        if (list[x].producto === prod) {
+            return i;
+        }
+        i += 1;
+    }
+
+    return -1;
+}
+
+// Acepta una tienda/cliente y un producto
+// Añade a dicha tienda/cliente el producto si no existe con cantidad 1. Si existe, aumenta la cantidad en 1.
+function addProducto(lista, prod) {
+
+    var ind = prodIndex(prod, lista);
+
+    if (ind == -1) {
+      lista.push({producto: prod, cantidad: 1});
+    } else {
+      lista[ind].cantidad += 1;
+    }
+}
+
+// Acepta una tienda y el nombre de un producto. Borra una unidad de dicho producto de la tienda.
+// Si ya no quedan unidades, borra el producto de la tienda.
+function deleteProducto(tienda, producto) {
+    
+    var ind = prodIndex(producto, tienda);
+
+    if (ind == -1) {
+      return;
+    } else {
+      if (tienda[ind].cantidad == 1) {
+	tienda.splice(ind, 1);
+      } else {
+	tienda[ind].cantidad -= 1;
+      }
+    }
+    return;
+}
+
+var result = prepareSimulation(10, 20, 200, ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p0"], 5);
+
+var i, j;
+
+for (i = 0; i < 10; i++) {
+    console.log("Productos que quiere el cliente " + i);
+    
+    for (j = 0; j < result[1][i].length; j++) {
+        console.log("  Nombre: " + result[1][i][j].producto);
+        console.log("  Cantidad: " + result[1][i][j].cantidad);
+    }
+}
+
+for (i = 0; i < 20; i++) {
+    console.log("Productos que tiene la tienda " + i);
+    
+    for (j = 0; j < result[0][i].length; j++) {
+        console.log("  Nombre: " + result[0][i][j].producto);
+        console.log("  Cantidad: " + result[0][i][j].cantidad);
+    }
+}
+
+for (i = 0; i < 10; i++) {
+    console.log("Tiendas que conoce el cliente " + i);
+    
+    for (j = 0; j < result[2][i].length; j++) {
+        console.log("  ID: " + result[2][i][j]);
+    }
+}
+</script>
+
+</head>
