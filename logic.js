@@ -115,7 +115,7 @@ function prodIndex(prod, list) {
     var elem;
     var i = 0;
     for (elem in list) {
-        if (list[elem].producto === prod) {
+        if (list[elem].nombre === prod) {
             return i;
         }
 	
