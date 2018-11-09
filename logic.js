@@ -96,6 +96,10 @@ function cederProds(tienda1, tienda2, rango) {
 
     for (i = 0; i < rango; i++) {
       var indiceProdRnd = Math.floor(Math.random() * tienda1.length);
+      
+      if (tienda1.length == 0) {
+	  return;
+      }
       var prodRnd = tienda1[indiceProdRnd].producto;
       deleteProducto(tienda1, prodRnd);
       addProducto(tienda2, prodRnd);
