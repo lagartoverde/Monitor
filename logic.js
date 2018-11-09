@@ -70,6 +70,7 @@ function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos
     idsTiendas.splice(rndPos2, 1);
 
     cederProds (productosTiendas[rndPos1], productosTiendas[rndPos2], rango);
+    i += 1;
   }
   
   // Por último, dar a cada cliente dos tiendas al azar que conoce
@@ -112,10 +113,13 @@ function cederProds(tienda1, tienda2, rango) {
 // Si no existe, devuelve -1.
 function prodIndex(prod, list) {
     var elem;
+    var i = 0;
     for (elem in list) {
         if (list[elem].producto === prod) {
-            return true;
+            return i;
         }
+	
+	i += 1;
     }
     return -1;
 }
