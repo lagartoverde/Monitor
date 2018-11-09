@@ -101,7 +101,7 @@ function cederProds(tienda1, tienda2, rango) {
       if (tienda1.length == 0) {
 	  return;
       }
-      var prodRnd = tienda1[indiceProdRnd].producto;
+      var prodRnd = tienda1[indiceProdRnd].nombre;
       deleteProducto(tienda1, prodRnd);
       addProducto(tienda2, prodRnd);
     }
