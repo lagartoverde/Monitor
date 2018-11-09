@@ -3,24 +3,24 @@ const app = express();
 const ip = require('ip');
 const parseXML = require('xml2js').parseString;
 
-const {prepareSimulation, launchSimulation, stopSimulation, construirXML, mockPrepareTienda, mockPrepareCliente} = require('./logic.js')
+const { prepareSimulation, launchSimulation, stopSimulation, construirXML, mockPrepareTienda, mockPrepareCliente } = require('./logic.js')
 const { addLog, addCliente, addTienda, clientes, tiendas } = require('./store.js');
-var emi = {ip: ip.address(), puerto: '3000', rol: 'Monitor'}
+var emi = { ip: ip.address(), puerto: '3000', rol: 'Monitor' }
 
 const bodyParser = require('body-parser');
 require('body-parser-xml')(bodyParser);
 const apiController = require('./apiController.js');
 
 app.use(bodyParser.xml({
-  verify: function(req, res, buf, encoding) {
+  verify: function (req, res, buf, encoding) {
     // get rawBody        
     req.rawBody = buf.toString();
-}
+  }
 }));
 
 app.use(express.static('public'));
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
@@ -43,14 +43,14 @@ app.post('/init', (req, res) => {
   }
 
   //Se comprueba el rol para diferenciar a la hora de preparar la simulacion
-  if(rol === 'comprador') {
+  if (rol === 'comprador') {
     addCliente(agente)
-  } else if(rol === 'tienda'){
+  } else if (rol === 'tienda') {
     addTienda(agente)
   }
-  var rec = {ip: agente.ip, puerto: agente.puerto, rol: agente.rol} 
+  var rec = { ip: agente.ip, puerto: agente.puerto, rol: agente.rol }
   //Se construye el XML que será enviado como ACK de la inicializacion donde se entregara el ID
-  construirXML(emi, rec, 'evento', 'plantillaACKInicio', {id: agente.id}).then((result) => {
+  construirXML(emi, rec, 'evento', 'plantillaACKInicio', { id: agente.id }).then((result) => {
     res.send(result)
   })
 })
@@ -62,7 +62,7 @@ app.post('/init', (req, res) => {
  */
 app.get('/prepareStore', (req, res) => {
   var datos = mockPrepareTienda()
-  var rec = {ip: '192.0.0.0', puerto: '80', rol: 'Tienda'} 
+  var rec = { ip: '192.0.0.0', puerto: '80', rol: 'Tienda' }
   construirXML(emi, rec, 'evento', 'plantillaInicializacionTienda', datos).then((result) => {
     res.send(result)
   })
@@ -74,7 +74,7 @@ app.get('/prepareStore', (req, res) => {
  */
 app.get('/prepareClient', (req, res) => {
   var datos = mockPrepareCliente()
-  var rec = {ip: '192.0.0.0', puerto: '80', rol: 'Tienda'} 
+  var rec = { ip: '192.0.0.0', puerto: '80', rol: 'Tienda' }
   construirXML(emi, rec, 'evento', 'plantillaInicializacionCliente', datos).then((result) => {
     res.send(result)
   })
@@ -87,38 +87,40 @@ app.get('/prepareClient', (req, res) => {
  */
 app.get('/prepare', async (req, res) => {
   // El monitor tiene que preparar la simulacion
-     results = prepareSimulation(100,10,1000,["p0","p1","p2","p3","p4","p5","p6","p7","p8","p9"],20);
-     var i = 0;
+  console.log(clientes.length)
+  console.log(tiendas.length)
+  results = prepareSimulation(clientes.length, tiendas.length, 10, ["p0", "p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9"], 20);
+  var i = 0;
 
-     /*var mockRec = {ip : '69.69.69.69', puerto : '42', rol : 'Comprador'};
-     var XML = await construirXML(emi,mockRec,'evento','plantillaInicializacionCliente',{producto : results[1][0], tienda : results[2][0]});
-     console.log(XML);*/
+  /*var mockRec = {ip : '69.69.69.69', puerto : '42', rol : 'Comprador'};
+  var XML = await construirXML(emi,mockRec,'evento','plantillaInicializacionCliente',{producto : results[1][0], tienda : results[2][0]});
+  console.log(XML);*/
 
-     for(let cliente of clientes) {
-     	var rec = {ip : cliente.ip, puerto: cliente.puerto, rol: 'Comprador'}
-	var prodTienda = {producto : results[1][i], tienda : results[2][i]};
-        var XML = construirXML(emi, rec, 'evento', 'plantillaInicializacionCliente', prodTienda);
-	
-	/*if (i < 10) {
-		console.log(XML);
-	}*/
+  for (let cliente of clientes) {
+    var rec = { ip: cliente.ip, puerto: cliente.puerto, rol: 'Comprador' }
+    var prodTienda = { producto: results[1][i], tienda: results[2][i] };
+    var XML = await construirXML(emi, rec, 'evento', 'plantillaInicializacionCliente', prodTienda);
 
-	i += 1;
-        // Aqui enviar XML. Consultar con tiendas y clientes en clase
-     } 
+    if (i < 10) {
+      console.log(XML);
+    }
 
-     i = 0;
-     for(let tienda of tiendas) {
-     	var rec = {ip : tienda.ip, puerto: tienda.puerto, rol: 'Tienda'}
-        var XML = construirXML(emi, rec, 'evento', 'plantillaInicializacionTienda', results[0][i]);
+    i += 1;
+    // Aqui enviar XML. Consultar con tiendas y clientes en clase
+  }
 
-	/*if (i < 10) {
-		console.log(XML);
-	}*/
+  i = 0;
+  for (let tienda of tiendas) {
+    var rec = { ip: tienda.ip, puerto: tienda.puerto, rol: 'Tienda' }
+    var XML = await construirXML(emi, rec, 'evento', 'plantillaInicializacionTienda', results[0][i]);
 
-	i += 1;
-        //Aqui enviar XML. Consultar con tiendas y clientes en clase
-     }
+    if (i < 10) {
+      console.log(XML);
+    }
+
+    i += 1;
+    //Aqui enviar XML. Consultar con tiendas y clientes en clase
+  }
 
   res.send('El monitor prepara la simulacion')
 })
@@ -154,7 +156,7 @@ app.post('/log', (req, res) => {
   const receptor = `${mensajeLog.mensaje[0].receptor[0].direccion[0].ip[0]}:${mensajeLog.mensaje[0].receptor[0].direccion[0].puerto[0]} / ${mensajeLog.mensaje[0].receptor[0].rol[0]}`;
   const date = new Date()
   const hora = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-  const tipo =mensajeLog.mensaje[0].tipo[0];
+  const tipo = mensajeLog.mensaje[0].tipo[0];
   const mensaje = getMensaje(req.rawBody);
   const log = {
     emisor,
@@ -172,11 +174,11 @@ app.post('/log', (req, res) => {
  * @param {Cuerpo del mensaje} body 
  */
 function getMensaje(body) {
-  const indexStart = body.search('<contenido>')+ 11;
+  const indexStart = body.search('<contenido>') + 11;
   const indexEnd = body.search('</contenido>');
   const mensaje = body.substring(indexStart, indexEnd);
   return mensaje;
 }
 
-app.listen(3000, ()=> console.log('Server listening in port 3000'));
+app.listen(3000, () => console.log('Server listening in port 3000'));
 
