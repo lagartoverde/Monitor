@@ -85,10 +85,14 @@ app.get('/prepareClient', (req, res) => {
  * Funcion de preparar tienda. Cuando se llama desde la interfaz web, envia un XML a cada agente en la
  * lista de clientes y de tiendas con los XML adecuados para su inicializacion
  */
-app.get('/prepare', (req, res) => {
+app.get('/prepare', async (req, res) => {
   // El monitor tiene que preparar la simulacion
-     results = prepareSimulation(100,10,1000,['p0','p1','p2','p3','p4','p5','p6','p7','p8','p9'],20);
+     results = prepareSimulation(100,10,1000,["p0","p1","p2","p3","p4","p5","p6","p7","p8","p9"],20);
      var i = 0;
+
+     /*var mockRec = {ip : '69.69.69.69', puerto : '42', rol : 'Comprador'};
+     var XML = await construirXML(emi,mockRec,'evento','plantillaInicializacionCliente',{producto : results[1][0], tienda : results[2][0]});
+     console.log(XML);*/
 
      for(let cliente of clientes) {
      	var rec = {ip : cliente.ip, puerto: cliente.puerto, rol: 'Comprador'}

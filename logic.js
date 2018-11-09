@@ -79,8 +79,8 @@ function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos
 	  var t1 = Math.floor(Math.random() * numTiendas);
 	  var t2 = Math.floor(Math.random() * numTiendas);
 	  
-	  tiendasConocidas[i].push(t1);
-	  tiendasConocidas[i].push(t2);
+	  tiendasConocidas[i].push(getTienda[t1]);
+	  tiendasConocidas[i].push(getTienda[t2]);
   }
 
   console.log('Simulacion preparada');
@@ -131,7 +131,7 @@ function addProducto(lista, prod) {
     var ind = prodIndex(prod, lista);
 
     if (ind == -1) {
-      lista.push({producto: prod, cantidad: 1});
+      lista.push({nombre: prod, cantidad: 1});
     } else {
       lista[ind].cantidad += 1;
     }
