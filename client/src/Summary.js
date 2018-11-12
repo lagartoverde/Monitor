@@ -49,14 +49,17 @@ export default class Summary extends React.Component {
           <tr>
             <th>IP</th>
             <th>Puerto</th>
+            <th>ID</th>
             <th>Rol</th>
             <th>Preparado</th>
             <th>Productos</th>
           </tr>
+          <tbody>
           {this.state.agents.map((agent)=> (
             <tr>
               <td>{agent.ip}</td>
               <td>{agent.puerto}</td>
+              <td>{agent.id}</td>
               <td>{agent.rol}</td>
               <td>{agent.ready ? <FontAwesomeIcon icon="check" /> : <FontAwesomeIcon icon="times" />}</td>
               <td>
@@ -66,6 +69,7 @@ export default class Summary extends React.Component {
               </td>
             </tr>
           ))}
+          </tbody>
         </table>
         <div className='buttons'>
           <Button variant="contained" color="primary" onClick={this.prepareSimulation}> Preparar </Button>

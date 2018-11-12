@@ -10,3 +10,7 @@
   padding: 10px 30px;
   font-size: 14px;
 }
+
+tbody {
+  overflow: scroll;
+}
