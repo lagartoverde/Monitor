@@ -208,10 +208,33 @@ async function prepararCliente(cliente, productos, tiendas) {
  * Lanza la simulacion, realizando un envio broadcast de los mensajes a los agentes
  */
 function launchSimulation() {
-
   setTimeout(checkEveryoneIsOn, 10000);
+  for(let cliente of clientes) {
+    goAgent(cliente, 'Comprador');
+  }
+  for(let tienda of tiendas) {
+    goAgent(tienda, 'Tienda');
+  }
   console.log('Simulacion lanzada');
 }
+
+async function goAgent(agente, rol) {
+  var emi = { ip: ip.address(), puerto: '3000', rol: 'Monitor' }
+  var rec = { ip: agente.ip, puerto: agente.puerto, rol }
+  var XML = await construirXML(emi, rec, 'evento', 'plantillaGo');
+  fetch(`http://${agente.ip}:${agente.puerto}`,{
+    method: 'POST',
+    headers: {
+      'content-Type': 'application/xml'
+    },
+    body: XML
+  }).then((response) => {
+    console.log(parseXML(response));
+  }).catch((error) => {
+    console.log(error)
+  })
+}
+
 /**
  * Detiene la simulacion, realizando un envio broadcast de los mensajes a los agentes
  */
