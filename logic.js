@@ -8,7 +8,9 @@ const ip = require('ip');
 const parseXML = require('xml2js').parseString;
 const fetch = require('node-fetch');
 
-
+function firstUpperCase(string){
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}
 function prepareSimulation() {
   const productos = ['zanahoria', 'patata', 'coliflor', 'manzana', 'platano', 'pimiento', 'lechuga', 'tomate']
   const [productosTiendas, productosClientes, tiendasConocidas] = repartirProductos(clientes.length, tiendas.length, 100, productos, 2);
@@ -291,4 +293,4 @@ function mockPrepareCliente(){
   return {producto: productos, tienda: tiendas}
 }
 
-module.exports = { prepareSimulation, launchSimulation, stopSimulation, construirXML, mockPrepareTienda, mockPrepareCliente}
+module.exports = { prepareSimulation, launchSimulation, stopSimulation, construirXML, mockPrepareTienda, mockPrepareCliente, firstUpperCase}
