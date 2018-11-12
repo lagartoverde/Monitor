@@ -86,47 +86,7 @@ app.get('/prepareClient', (req, res) => {
  * lista de clientes y de tiendas con los XML adecuados para su inicializacion
  */
 app.get('/prepare', async (req, res) => {
-  // El monitor tiene que preparar la simulacion
-  console.log(clientes.length)
-  console.log(tiendas.length)
-  results = prepareSimulation(clientes.length, tiendas.length, 1000, ["p0", "p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9"], 20);
-  var i = 0;
-
-  /*var mockRec = {ip : '69.69.69.69', puerto : '42', rol : 'Comprador'};
-  var XML = await construirXML(emi,mockRec,'evento','plantillaInicializacionCliente',{producto : results[1][0], tienda : results[2][0]});
-  console.log(XML);*/
-
-  for (let cliente of clientes) {
-    var rec = { ip: cliente.ip, puerto: cliente.puerto, rol: 'Comprador' }
-    var prodTienda = { producto: results[1][i], tienda: results[2][i] };
-    var XML = await construirXML(emi, rec, 'evento', 'plantillaInicializacionCliente', prodTienda);
-
-    if (i < 10) {
-      console.log(XML);
-    }
-
-    i += 1;
-    // Aqui enviar XML. Consultar con tiendas y clientes en clase
-  }
-
-     /* console.log('Aquí llega')
-     var mockRec = {ip : '69.69.69.69', puerto : '42', rol : 'Tienda'};
-     var XML = await construirXML(emi,mockRec,'evento','plantillaInicializacionTienda', {producto : results[0][0]});
-     console.log(XML);*/
-
-  i = 0;
-  for (let tienda of tiendas) {
-    var rec = { ip: tienda.ip, puerto: tienda.puerto, rol: 'Tienda' }
-    var XML = await construirXML(emi, rec, 'evento', 'plantillaInicializacionTienda', {producto : results[0][i]});
-
-    if (i < 10) {
-      console.log(XML);
-    }
-
-    i += 1;
-    //Aqui enviar XML. Consultar con tiendas y clientes en clase
-  }
-
+  prepareSimulation()
   res.send('El monitor prepara la simulacion')
 })
 

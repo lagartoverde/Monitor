@@ -28,6 +28,12 @@ export default class Summary extends React.Component {
       }))
     })
   }
+  prepareSimulation() {
+    fetch('http://localhost:3000/prepare', {
+      method: 'GET',
+      mode: 'cors'
+    })
+  }
   render() {
     return (
       <div className='container'>
@@ -55,7 +61,7 @@ export default class Summary extends React.Component {
           ))}
         </table>
         <div className='buttons'>
-          <Button variant="contained" color="primary"> Preparar </Button>
+          <Button variant="contained" color="primary" onClick={this.prepareSimulation}> Preparar </Button>
           <Button variant="contained" color="secondary"> Lanzar </Button>
         </div>
       </div>

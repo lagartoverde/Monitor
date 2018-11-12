@@ -4,6 +4,21 @@ const handlebars = require('handlebars');
 const fs = require('fs');
 const util = require('util');
 const readFile = util.promisify(fs.readFile);
+const ip = require('ip');
+const parseXML = require('xml2js').parseString;
+const fetch = require('node-fetch');
+
+
+function prepareSimulation() {
+  const productos = ['zanahoria', 'patata', 'coliflor', 'manzana', 'platano', 'pimiento', 'lechuga', 'tomate']
+  const [productosTiendas, productosClientes, tiendasConocidas] = repartirProductos(clientes.length, tiendas.length, 100, productos, 2);
+  for(let i = 0; i<tiendas.length; i++){
+    prepararTienda(tiendas[i], productosTiendas[i]);
+  }
+  for(let j = 0; j< clientes.length; j++){
+    prepararCliente(clientes[j], productosClientes[j], tiendasConocidas[j]);
+  }
+}
 
 /**
  * Inicialización de las tiendas y los clientes. A cada tienda se le da una cantidad aleatoria de productos, 
@@ -21,8 +36,7 @@ const readFile = util.promisify(fs.readFile);
  *    tienda o por cliente, los cuales contienen la lista de productos de dicha tienda o cliente. El último array indica
  *    qué tiendas conoce cada cliente de antemano.
  */
-function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos, rango) {
-
+function repartirProductos(numClientes, numTiendas, numProductos, listaProductos, rango) {
   const factorDesviacion = 10;
   var productosClientes = [];
   var productosTiendas = [];
@@ -89,6 +103,7 @@ function prepareSimulation(numClientes, numTiendas, numProductos, listaProductos
 }
 
 
+
 // Acepta dos tiendas y una cantidad máxima de productos a ceder de una tienda a otra.
 // Transfiere productos al azar de una tienda a otra.
 function cederProds(tienda1, tienda2, rango) {
@@ -153,6 +168,40 @@ function deleteProducto(tienda, producto) {
       }
     }
     return;
+}
+
+async function prepararTienda(tienda, productos) {
+  var emi = { ip: ip.address(), puerto: '3000', rol: 'Monitor' }
+  var rec = { ip: tienda.ip, puerto: tienda.puerto, rol: 'Tienda' }
+  var XML = await construirXML(emi, rec, 'evento', 'plantillaInicializacionTienda', {productos});
+  fetch(`http://${tienda.ip}:${tienda.puerto}`,{
+    method: 'POST',
+    headers: {
+      'content-Type': 'application/xml'
+    },
+    body: XML
+  }).then((response) => {
+    console.log(parseXML(response));
+  }).catch((error) => {
+    console.log(error)
+  })
+}
+
+async function prepararCliente(cliente, productos, tiendas) {
+  var emi = { ip: ip.address(), puerto: '3000', rol: 'Monitor' }
+  var rec = { ip: cliente.ip, puerto: cliente.puerto, rol: 'Cliente' }
+  var XML = await construirXML(emi, rec, 'evento', 'plantillaInicializacionCliente', {productos, tiendas});
+  fetch(`http://${cliente.ip}:${cliente.puerto}`,{
+    method: 'POST',
+    headers: {
+      'content-Type': 'application/xml'
+    },
+    body: XML
+  }).then((response) => {
+    console.log(parseXML(response));
+  }).catch((error) => {
+    console.log(error)
+  })
 }
 
 /**
