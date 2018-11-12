@@ -4,7 +4,7 @@ const { clientes, tiendas, logs, getLog } = require('./store');
 
 router.get('/agentes',(req,res) => {
   let clientesConRol = clientes.map((cliente) => {
-    cliente.rol = 'cliente'
+    cliente.rol = 'comprador'
     return cliente
   })
   tiendasConRol = tiendas.map((tienda) => {
