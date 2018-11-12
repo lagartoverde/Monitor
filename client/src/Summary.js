@@ -9,7 +9,8 @@ export default class Summary extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      agents: []
+      agents: [],
+      ready: false
     }
     this.getAgents = this.getAgents.bind(this);
   }
@@ -23,8 +24,14 @@ export default class Summary extends React.Component {
     })
     .then((response) => response.json())
     .then((json)=> {
+      let ready = true;
+      if(json.length === 0) ready = false;
+      for(let agent of json) {
+        if(!agent.ready) ready = false;
+      }
       this.setState((prevState) => ({
-        agents: json
+        agents: json,
+        ready
       }))
     })
   }
@@ -62,7 +69,7 @@ export default class Summary extends React.Component {
         </table>
         <div className='buttons'>
           <Button variant="contained" color="primary" onClick={this.prepareSimulation}> Preparar </Button>
-          <Button variant="contained" color="secondary"> Lanzar </Button>
+          <Button variant="contained" color="secondary" disabled={!this.state.ready}> Lanzar </Button>
         </div>
       </div>
     )
