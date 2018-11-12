@@ -4,7 +4,7 @@ import {Navbar, Nav, NavItem, NavDropdown, MenuItem} from 'react-bootstrap';
 export default class Header extends React.Component {
   render() {
     return (
-      <Navbar inverse>
+      <Navbar inverse sticky='top'>
         <Navbar.Header>
           <Navbar.Brand>
             <a href="/">Monitor</a>

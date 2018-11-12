@@ -46,14 +46,16 @@ export default class Summary extends React.Component {
       <div className='container'>
         <h1>Vista General</h1>
         <table>
-          <tr>
-            <th>IP</th>
-            <th>Puerto</th>
-            <th>ID</th>
-            <th>Rol</th>
-            <th>Preparado</th>
-            <th>Productos</th>
-          </tr>
+          <thead>
+            <tr>
+              <th>IP</th>
+              <th>Puerto</th>
+              <th>ID</th>
+              <th>Rol</th>
+              <th>Preparado</th>
+              <th>Productos</th>
+            </tr>
+          </thead>
           <tbody>
           {this.state.agents.map((agent)=> (
             <tr>
