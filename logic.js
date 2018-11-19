@@ -14,6 +14,8 @@ function firstUpperCase(string){
 function prepareSimulation() {
   const productos = ['zanahoria', 'patata', 'coliflor', 'manzana', 'platano', 'pimiento', 'lechuga', 'tomate']
   const [productosTiendas, productosClientes, tiendasConocidas] = repartirProductos(clientes.length, tiendas.length, 100, productos, 2);
+  console.log('Mis tiendas')
+  console.log(tiendasConocidas)
   for(let i = 0; i<tiendas.length; i++){
     prepararTienda(tiendas[i], productosTiendas[i]);
   }
@@ -93,10 +95,13 @@ function repartirProductos(numClientes, numTiendas, numProductos, listaProductos
   // TODO: cambiar en el futuro para evitar deadlocks
   for (i = 0; i < numClientes; i++) {
 	  var t1 = Math.floor(Math.random() * numTiendas);
-	  var t2 = Math.floor(Math.random() * numTiendas);
+    var t2 = Math.floor(Math.random() * numTiendas);
+    while (t1 == t2) {
+      t2 = Math.floor(Math.random() * numTiendas);
+    }
 	  
-	  tiendasConocidas[i].push(getTienda[t1]);
-	  tiendasConocidas[i].push(getTienda[t2]);
+	  tiendasConocidas[i].push(getTienda(t1));
+	  tiendasConocidas[i].push(getTienda(t2));
   }
 
   console.log('Simulacion preparada');
@@ -174,7 +179,7 @@ function deleteProducto(tienda, producto) {
 
 async function prepararTienda(tienda, productos) {
   var emi = { ip: ip.address(), puerto: '3000', rol: 'Monitor' }
-  var rec = { ip: tienda.ip, puerto: tienda.puerto, rol: 'Tienda' }
+  var rec = { ip: tienda.ip, puerto: tienda.puerto, rol: 'Tienda', id: tienda.id }
   var XML = await construirXML(emi, rec, 'evento', 'plantillaInicializacionTienda', {productos});
   fetch(`http://${tienda.ip}:${tienda.puerto}`,{
     method: 'POST',
@@ -191,7 +196,7 @@ async function prepararTienda(tienda, productos) {
 
 async function prepararCliente(cliente, productos, tiendas) {
   var emi = { ip: ip.address(), puerto: '3000', rol: 'Monitor' }
-  var rec = { ip: cliente.ip, puerto: cliente.puerto, rol: 'Cliente' }
+  var rec = { ip: cliente.ip, puerto: cliente.puerto, rol: 'Cliente', id:cliente.id }
   var XML = await construirXML(emi, rec, 'evento', 'plantillaInicializacionCliente', {productos, tiendas});
   fetch(`http://${cliente.ip}:${cliente.puerto}`,{
     method: 'POST',
@@ -275,22 +280,4 @@ function checkEveryoneIsOn() {
   }
 }
 
-/**
- * Devuelve un array con el formato necesario para crear el XML de inicio de Tienda, para propositos
- * de comprobacion de conexion
- */
-function mockPrepareTienda(){
-  return {producto: [{nombre: 'p1', cantidad: '1'}, {nombre: 'p2', cantidad: '2'}, {nombre: 'p3', cantidad: '3'}, {nombre: 'p4', cantidad: '4'}]}
-}
-
-/**
- * Devuelve un array con el formato necesario para crear el XML de inicio de Cliente, para propositos
- * de comprobacion de conexion
- */
-function mockPrepareCliente(){
-  var productos = [{nombre: 'p1', cantidad: '1'}, {nombre: 'p2', cantidad: '2'}, {nombre: 'p3', cantidad: '3'}, {nombre: 'p4', cantidad: '4'}]
-  var tiendas = [{ip: '192.168.1.1', puerto: '80', id: '1'}, {ip: '192.168.1.2', puerto: '80', id: '2'}, {ip: '192.168.1.3', puerto: '80', id: '3'}, {ip: '192.168.1.4', puerto: '80', id: '4'}]
-  return {producto: productos, tienda: tiendas}
-}
-
-module.exports = { prepareSimulation, launchSimulation, stopSimulation, construirXML, mockPrepareTienda, mockPrepareCliente, firstUpperCase}
+module.exports = { prepareSimulation, launchSimulation, stopSimulation, construirXML, firstUpperCase}

@@ -4,7 +4,7 @@ const ip = require('ip');
 const parseXML = require('xml2js').parseString;
 
 
-const { prepareSimulation, launchSimulation, stopSimulation, construirXML, mockPrepareTienda, mockPrepareCliente, firstUpperCase } = require('./logic.js')
+const { prepareSimulation, launchSimulation, stopSimulation, construirXML, firstUpperCase } = require('./logic.js')
 const { addLog, addCliente, addTienda, clientes, tiendas } = require('./store.js');
 var emi = { ip: ip.address(), puerto: '3000', rol: 'Monitor' }
 
@@ -56,31 +56,6 @@ app.post('/init', (req, res) => {
     res.send(result)
   })
 
-})
-
-
-/**
- * Funcion para enviar un mensaje de preparacion de tienda. Provisional, solo para probar
- * conectividad entre dispositivos
- */
-app.get('/prepareStore', (req, res) => {
-  var datos = mockPrepareTienda()
-  var rec = { ip: '192.0.0.0', puerto: '80', rol: 'Tienda' }
-  construirXML(emi, rec, 'evento', 'plantillaInicializacionTienda', datos).then((result) => {
-    res.send(result)
-  })
-})
-
-/**
- * Funcion para enviar un mensaje de preparacion de cliente. Provisional, solo para probar
- * conectividad entre dispositivos
- */
-app.get('/prepareClient', (req, res) => {
-  var datos = mockPrepareCliente()
-  var rec = { ip: '192.0.0.0', puerto: '80', rol: 'Tienda' }
-  construirXML(emi, rec, 'evento', 'plantillaInicializacionCliente', datos).then((result) => {
-    res.send(result)
-  })
 })
 
 
