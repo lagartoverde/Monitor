@@ -180,7 +180,7 @@ function deleteProducto(tienda, producto) {
 async function prepararTienda(tienda, productos) {
   var emi = { ip: ip.address(), puerto: '3000', rol: 'Monitor' }
   var rec = { ip: tienda.ip, puerto: tienda.puerto, rol: 'Tienda', id: tienda.id }
-  var XML = await construirXML(emi, rec, 'evento', 'plantillaInicializacionTienda', {productos});
+  var XML = await construirXML(emi, rec, 'inicializacion', 'plantillaInicializacionTienda', {productos});
   fetch(`http://${tienda.ip}:${tienda.puerto}`,{
     method: 'POST',
     headers: {
@@ -197,7 +197,7 @@ async function prepararTienda(tienda, productos) {
 async function prepararCliente(cliente, productos, tiendas) {
   var emi = { ip: ip.address(), puerto: '3000', rol: 'Monitor' }
   var rec = { ip: cliente.ip, puerto: cliente.puerto, rol: 'Cliente', id:cliente.id }
-  var XML = await construirXML(emi, rec, 'evento', 'plantillaInicializacionCliente', {productos, tiendas});
+  var XML = await construirXML(emi, rec, 'inicializacion', 'plantillaInicializacionCliente', {productos, tiendas});
   fetch(`http://${cliente.ip}:${cliente.puerto}`,{
     method: 'POST',
     headers: {
