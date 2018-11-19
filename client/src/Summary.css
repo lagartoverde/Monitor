@@ -1,8 +1,12 @@
+.container {
+  position: relative;
+}
 .buttons {
-  position: absolute;
-  bottom: 5%;
-  right: 0;
-  width: 30%;
+  display: block;
+  margin-left: 65%;;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  width: 35%;
   display: flex;
   justify-content: space-between;
 }
@@ -10,3 +14,4 @@
   padding: 10px 30px;
   font-size: 14px;
 }
+

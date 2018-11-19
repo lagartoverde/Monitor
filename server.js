@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const ip = require('ip');
 const parseXML = require('xml2js').parseString;
-
+const validator = require('xsd-schema-validator');
 
 const { prepareSimulation, launchSimulation, stopSimulation, construirXML, firstUpperCase } = require('./logic.js')
 const { addLog, addCliente, addTienda, clientes, tiendas } = require('./store.js');
@@ -52,7 +52,10 @@ app.post('/init', (req, res) => {
   var rec = { ip: agente.ip, puerto: agente.puerto, rol: agente.rol }
   //Se construye el XML que será enviado como ACK de la inicializacion donde se entregara el ID
   construirXML(emi, rec, 'evento', 'plantillaACKInicio', { id: agente.id }).then((result) => {
-    
+    validator.validateXML(result, 'SistemasMultiagentes2018/Grupos/G6/Schemas/SchemaACKInicio.xsd', function(err, result) {
+      console.log(err)
+      console.log(result.valid)// true
+    });
     res.send(result)
   })
 

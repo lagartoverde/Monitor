@@ -9,7 +9,8 @@ export default class Summary extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      agents: []
+      agents: [],
+      ready: false
     }
     this.getAgents = this.getAgents.bind(this);
   }
@@ -23,8 +24,14 @@ export default class Summary extends React.Component {
     })
     .then((response) => response.json())
     .then((json)=> {
+      let ready = true;
+      if(json.length === 0) ready = false;
+      for(let agent of json) {
+        if(!agent.ready) ready = false;
+      }
       this.setState((prevState) => ({
-        agents: json
+        agents: json,
+        ready
       }))
     })
   }
@@ -39,17 +46,22 @@ export default class Summary extends React.Component {
       <div className='container'>
         <h1>Vista General</h1>
         <table>
-          <tr>
-            <th>IP</th>
-            <th>Puerto</th>
-            <th>Rol</th>
-            <th>Preparado</th>
-            <th>Productos</th>
-          </tr>
+          <thead>
+            <tr>
+              <th>IP</th>
+              <th>Puerto</th>
+              <th>ID</th>
+              <th>Rol</th>
+              <th>Preparado</th>
+              <th>Productos</th>
+            </tr>
+          </thead>
+          <tbody>
           {this.state.agents.map((agent)=> (
             <tr>
               <td>{agent.ip}</td>
               <td>{agent.puerto}</td>
+              <td>{agent.id}</td>
               <td>{agent.rol}</td>
               <td>{agent.ready ? <FontAwesomeIcon icon="check" /> : <FontAwesomeIcon icon="times" />}</td>
               <td>
@@ -59,10 +71,11 @@ export default class Summary extends React.Component {
               </td>
             </tr>
           ))}
+          </tbody>
         </table>
         <div className='buttons'>
           <Button variant="contained" color="primary" onClick={this.prepareSimulation}> Preparar </Button>
-          <Button variant="contained" color="secondary"> Lanzar </Button>
+          <Button variant="contained" color="secondary" disabled={!this.state.ready}> Lanzar </Button>
         </div>
       </div>
     )
