@@ -17,6 +17,9 @@ export default class Header extends React.Component {
           <NavItem eventKey={2} href="/logs">
             Logs
           </NavItem>
+          <NavItem eventKey={2} href="/graphs">
+            Graphs
+          </NavItem>
         </Nav>
       </Navbar>
     )
