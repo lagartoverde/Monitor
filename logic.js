@@ -8,20 +8,17 @@ const ip = require('ip');
 const parseXML = require('xml2js').parseString;
 const fetch = require('node-fetch');
 
+
 function firstUpperCase(string){
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
 function prepareSimulation() {
   const productos = ['zanahoria', 'patata', 'coliflor', 'manzana', 'platano', 'pimiento', 'lechuga', 'tomate']
   const [productosTiendas, productosClientes, tiendasConocidas] = repartirProductos(clientes.length, tiendas.length, 100, productos, 2);
-  console.log('Mis tiendas')
-  console.log(tiendasConocidas)
   for(let i = 0; i<tiendas.length; i++){
     prepararTienda(tiendas[i], productosTiendas[i]);
   }
-  for(let j = 0; j< clientes.length; j++){
-    prepararCliente(clientes[j], productosClientes[j], tiendasConocidas[j]);
-  }
+  return [productosClientes, tiendasConocidas]
 }
 
 /**
@@ -278,10 +275,12 @@ async function construirCuerpo(plantilla, datos){
  */
 async function construirXML(emisor, receptor, tipo, plantilla, datos){
   const date = new Date()
+  var today = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
+  var hour = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
   const data = await readFile('xml/plantillaCabecera.hbs','utf8')
   var template = handlebars.compile(data)
   var cuerpo = await construirCuerpo(plantilla, datos)
-  var context = {emisor: emisor, receptor: receptor, tipo: tipo, hora: date, cuerpo: cuerpo}
+  var context = {emisor: emisor, receptor: receptor, tipo: tipo, fecha: today, hora: hour, cuerpo: cuerpo}
   var xml = template(context);
   return xml
 }

@@ -3,9 +3,13 @@ const app = express();
 const ip = require('ip');
 const parseXML = require('xml2js').parseString;
 const validator = require('xsd-schema-validator');
+var prepared = false
+var go = false
+var pc = []
+var tc = []
 
-const { prepareSimulation, launchSimulation, stopSimulation, construirXML, firstUpperCase } = require('./logic.js')
-const { addLog, addCliente, addTienda, clientes, tiendas } = require('./store.js');
+const { prepareSimulation, launchSimulation, stopSimulation, construirXML, firstUpperCase} = require('./logic.js')
+const { addLog, addCliente, addTienda, clientes } = require('./store.js');
 var emi = { ip: ip.address(), puerto: '3000', rol: 'Monitor' }
 
 const bodyParser = require('body-parser');
@@ -53,8 +57,8 @@ app.post('/init', (req, res) => {
   //Se construye el XML que será enviado como ACK de la inicializacion donde se entregara el ID
   construirXML(emi, rec, 'evento', 'plantillaACKInicio', { id: agente.id }).then((result) => {
     validator.validateXML(result, 'SistemasMultiagentes2018/Grupos/G6/Schemas/SchemaACKInicio.xsd', function(err, result) {
-      console.log(err)
-      console.log(result.valid)// true
+      //console.log(err)
+      //console.log(result.valid)// true
     });
     res.send(result)
   })
@@ -67,10 +71,43 @@ app.post('/init', (req, res) => {
  * lista de clientes y de tiendas con los XML adecuados para su inicializacion
  */
 app.get('/prepare', async (req, res) => {
-  prepareSimulation()
+  prepared = true
+  [pc, tc] = await prepareSimulation()
+  //TODO: PREPARE SIMULATION DOES NOT RETURN ANYTHING
+  console.log(pc)
   res.send('El monitor prepara la simulacion')
 })
 
+app.post('/prepareCliente', async (req, res) => {
+  const ip = req.body.mensaje.emisor[0].direccion[0].ip[0];
+  const puerto = req.body.mensaje.emisor[0].direccion[0].puerto[0];
+  const id = req.body.mensaje.emisor[0].direccion[0].id[0];
+  const rol = 'Comprador'
+
+  var rec = { ip: ip, puerto: puerto, rol: rol, id: id}
+
+  if (!prepared){
+    construirXML(emi, rec, 'evento', 'plantillaNotReady').then((result) => {
+      // validator.validateXML(result, 'SistemasMultiagentes2018/Grupos/G6/Schemas/SchemaACKInicio.xsd', function(err, result) {
+      //   console.log(err)
+      //   console.log(result.valid)// true
+      // });
+      res.send(result)
+    })
+  }else{
+    clientes.forEach((cliente, index) => {
+      console.log('indice ' + index)
+      console.log('id ' + id)
+      if (index == id){
+        console.log('Entra en el bucle')
+        construirXML(emi, rec, 'inicializacion', 'plantillaInicializacionCliente', {productos: productosClientes[index], tiendas: tiendasConocidas[index]}).then((result) => {
+          res.send(result)
+        });
+        
+      }
+    })
+  }
+})
 /**
  * Funcion que inicializa la simulacion. Cuando se llama desde la interfaz web, manda un mensaje XML broadcast
  * para que todos los agentes empiecen a funcionar
@@ -79,6 +116,11 @@ app.get('/go', (req, res) => {
   // El monitor lanza la simulacion
   launchSimulation();
   res.send('El monitor lanza la simulacion');
+})
+
+app.get('/test', (req, res) => {
+  // El monitor lanza la simulacion
+  res.send([pc, tc]);
 })
 
 /**
