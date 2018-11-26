@@ -5,8 +5,8 @@ const parseXML = require('xml2js').parseString;
 const validator = require('xsd-schema-validator');
 var prepared = false
 var go = false
-var pc = []
-var tc = []
+var productosClientes = []
+var tiendasConocidas = []
 
 const { prepareSimulation, launchSimulation, stopSimulation, construirXML, firstUpperCase} = require('./logic.js')
 const { addLog, addCliente, addTienda, clientes } = require('./store.js');
@@ -70,11 +70,13 @@ app.post('/init', (req, res) => {
  * Funcion de preparar tienda. Cuando se llama desde la interfaz web, envia un XML a cada agente en la
  * lista de clientes y de tiendas con los XML adecuados para su inicializacion
  */
-app.get('/prepare', async (req, res) => {
+app.get('/prepare',(req, res) => {
   prepared = true
-  [pc, tc] = await prepareSimulation()
+  const result = prepareSimulation()
+  productosClientes = result[0]
+  tiendasConocidas = result[1]
   //TODO: PREPARE SIMULATION DOES NOT RETURN ANYTHING
-  console.log(pc)
+  console.log(productosClientes)
   res.send('El monitor prepara la simulacion')
 })
 
@@ -100,8 +102,10 @@ app.post('/prepareCliente', async (req, res) => {
       console.log('id ' + id)
       if (index == id){
         console.log('Entra en el bucle')
+        console.log(productosClientes[index])
+        console.log(tiendasConocidas[index])
         construirXML(emi, rec, 'inicializacion', 'plantillaInicializacionCliente', {productos: productosClientes[index], tiendas: tiendasConocidas[index]}).then((result) => {
-          res.send(result)
+          res.end(result)
         });
         
       }
@@ -120,7 +124,7 @@ app.get('/go', (req, res) => {
 
 app.get('/test', (req, res) => {
   // El monitor lanza la simulacion
-  res.send([pc, tc]);
+  res.send([productosClientes, tiendasConocidas]);
 })
 
 /**
