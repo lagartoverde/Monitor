@@ -65,7 +65,7 @@ export default class Summary extends React.Component {
               <td>{agent.rol}</td>
               <td>{agent.ready ? <FontAwesomeIcon icon="check" /> : <FontAwesomeIcon icon="times" />}</td>
               <td>
-                <Link to='/products/1'>
+              <Link to={`/products/${agent.id}`}>
                   <FontAwesomeIcon icon="ellipsis-h" />
                 </Link>
               </td>

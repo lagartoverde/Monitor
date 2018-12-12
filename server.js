@@ -35,7 +35,8 @@ app.use('/api', apiController);
 
 app.post('/init', (req, res) => {
   // Una tienda/cliente se ha inicializado
-  console.log('Emisor IP');
+  //console.log('Emisor IP');
+  console.log(req.body)
   //Se obtienen los parámetros correspondientes para añadirlos del XML
   const ip = req.body.mensaje.emisor[0].direccion[0].ip[0];
   const puerto = req.body.mensaje.emisor[0].direccion[0].puerto[0];
@@ -75,12 +76,11 @@ app.get('/prepare',(req, res) => {
   const result = prepareSimulation()
   productosClientes = result[0]
   tiendasConocidas = result[1]
-  //TODO: PREPARE SIMULATION DOES NOT RETURN ANYTHING
-  console.log(productosClientes)
   res.send('El monitor prepara la simulacion')
 })
 
 app.post('/prepareCliente', async (req, res) => {
+  console.log(req.body.mensaje.emisor[0].direccion)
   const ip = req.body.mensaje.emisor[0].direccion[0].ip[0];
   const puerto = req.body.mensaje.emisor[0].direccion[0].puerto[0];
   const id = req.body.mensaje.emisor[0].direccion[0].id[0];
@@ -105,7 +105,7 @@ app.post('/prepareCliente', async (req, res) => {
         console.log(productosClientes[index])
         console.log(tiendasConocidas[index])
         construirXML(emi, rec, 'inicializacion', 'plantillaInicializacionCliente', {productos: productosClientes[index], tiendas: tiendasConocidas[index]}).then((result) => {
-          res.end(result)
+          res.send(result)
         });
         
       }

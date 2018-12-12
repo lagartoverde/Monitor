@@ -175,6 +175,7 @@ function deleteProducto(tienda, producto) {
 }
 
 async function prepararTienda(tienda, productos) {
+  tienda.productos = productos
   var emi = { ip: ip.address(), puerto: '3000', rol: 'Monitor' }
   var rec = { ip: tienda.ip, puerto: tienda.puerto, rol: 'Tienda', id: tienda.id }
   var XML = await construirXML(emi, rec, 'inicializacion', 'plantillaInicializacionTienda', {productos});
@@ -185,7 +186,8 @@ async function prepararTienda(tienda, productos) {
     },
     body: XML
   }).then((response) => {
-    console.log(parseXML(response));
+    response.text()
+    tienda.ready = true
   }).catch((error) => {
     console.log(error)
   })

@@ -24,4 +24,9 @@ router.get('/logs/:id', (req,res) => {
   res.json({ mensaje: getLog(id).mensaje });
 })
 
+router.get('/products/:id', (req,res) => {
+  const id = req.params.id;
+  res.json(tiendas[id].productos);
+})
+
 module.exports = router

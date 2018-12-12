@@ -10,29 +10,25 @@ class Products extends React.Component {
     this.state = {
       items: []
     }
+    this.getProducts = this.getProducts.bind(this)
   }
   componentDidMount() {
-    this.setState((prevState) => ({
-      items: [
-        {
-          nombre: 'Patatas',
-          cantidad: 2
-        },
-        {
-          nombre: 'Zanahorias',
-          cantidad: 5
-        },
-        {
-          nombre: 'Calabacines',
-          cantidad: 3
-        },
-        {
-          nombre: 'Berenjenas',
-          cantidad: 7
-        },
-      ]
-    }))
+    this.getProducts()
   }
+
+  getProducts(){
+    fetch(`http://localhost:3000/api/products/${this.props.match.params.id}`, {
+      method: 'GET',
+      mode: 'cors'
+    })
+    .then((response) => response.json())
+    .then((json)=> {
+      this.setState((prevState) => ({
+        items: json
+      }))
+    })
+  }
+
   render() {
     return (
       <div className='container'>
