@@ -23,16 +23,20 @@ app.use(bodyParser.xml({
   }
 }));
 
+
 app.use(express.static('public'));
 
+// Permitimos todas las conexiones de todos los origenes
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
 
+// Delegamos la ruta /api al controlador apiController
 app.use('/api', apiController);
 
+// la ruta /init permita a un agente inicializarse 
 app.post('/init', (req, res) => {
   // Una tienda/cliente se ha inicializado
   //console.log('Emisor IP');
@@ -79,6 +83,8 @@ app.get('/prepare',(req, res) => {
   res.send('El monitor prepara la simulacion')
 })
 
+// Ruta /prepareCliente permite el uso de polling para determinar cuando un agente
+// debe prepararse
 app.post('/prepareCliente', async (req, res) => {
   console.log(req.body.mensaje.emisor[0].direccion)
   const ip = req.body.mensaje.emisor[0].direccion[0].ip[0];
@@ -123,6 +129,8 @@ app.get('/go', (req, res) => {
   res.send('El monitor lanza la simulacion');
 })
 
+// Ruta /goCliente permite el uso de polling para determinar cuando un agente
+// debe empezar con la simulacion
 app.post('/goCliente', (req, res) => {
   const ip = req.body.mensaje.emisor[0].direccion[0].ip[0];
   const puerto = req.body.mensaje.emisor[0].direccion[0].puerto[0];

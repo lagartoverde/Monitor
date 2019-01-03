@@ -8,7 +8,7 @@ const ip = require('ip');
 const parseXML = require('xml2js').parseString;
 const fetch = require('node-fetch');
 
-
+// Convierte "string" a "String"
 function firstUpperCase(string){
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
@@ -174,6 +174,8 @@ function deleteProducto(tienda, producto) {
     return;
 }
 
+// Envia el xml necesario para prepara la tienda y la marca
+// como preparada si responde de forma correcta
 async function prepararTienda(tienda, productos) {
   tienda.productos = productos
   var emi = { ip: ip.address(), puerto: '3000', rol: 'Monitor' }
@@ -193,6 +195,8 @@ async function prepararTienda(tienda, productos) {
   })
 }
 
+// Envia el xml necesario para prepara el cliente y lo marca
+// como preparado si responde de forma correcta
 async function prepararCliente(cliente, productos, tiendas) {
   var emi = { ip: ip.address(), puerto: '3000', rol: 'Monitor' }
   var rec = { ip: cliente.ip, puerto: cliente.puerto, rol: 'Cliente', id:cliente.id }
@@ -224,6 +228,7 @@ function launchSimulation() {
   console.log('Simulacion lanzada');
 }
 
+// Envia el xml necesario para el go a un agente
 async function goAgent(agente, rol) {
   var emi = { ip: ip.address(), puerto: '3000', rol: 'Monitor' }
   var rec = { ip: agente.ip, puerto: agente.puerto, rol }
