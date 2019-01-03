@@ -118,8 +118,36 @@ app.post('/prepareCliente', async (req, res) => {
  */
 app.get('/go', (req, res) => {
   // El monitor lanza la simulacion
+  go = true;
   launchSimulation();
   res.send('El monitor lanza la simulacion');
+})
+
+app.post('/goCliente', (req, res) => {
+  const ip = req.body.mensaje.emisor[0].direccion[0].ip[0];
+  const puerto = req.body.mensaje.emisor[0].direccion[0].puerto[0];
+  const id = req.body.mensaje.emisor[0].direccion[0].id[0];
+  const rol = 'Comprador'
+
+  var rec = { ip: ip, puerto: puerto, rol: rol, id: id}
+  if(!go) {
+    construirXML(emi, rec, 'evento', 'plantillaNotReady').then((result) => {
+      // validator.validateXML(result, 'SistemasMultiagentes2018/Grupos/G6/Schemas/SchemaACKInicio.xsd', function(err, result) {
+      //   console.log(err)
+      //   console.log(result.valid)// true
+      // });
+      res.send(result)
+    })
+  } else {
+    construirXML(emi, rec, 'evento', 'plantillaGo').then((result) => {
+      // validator.validateXML(result, 'SistemasMultiagentes2018/Grupos/G6/Schemas/SchemaACKInicio.xsd', function(err, result) {
+      //   console.log(err)
+      //   console.log(result.valid)// true
+      // });
+      res.send(result)
+    })
+  }
+  
 })
 
 app.get('/test', (req, res) => {

@@ -204,7 +204,7 @@ async function prepararCliente(cliente, productos, tiendas) {
     },
     body: XML
   }).then((response) => {
-    console.log(parseXML(response));
+    console.log(response)
   }).catch((error) => {
     console.log(error)
   })
